@@ -139,20 +139,20 @@ df = read_frame(
 )
 
 
-from simmate.shortcuts import setup
-from simmate.database.diffusion import Pathway as Pathway_DB
-from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
+# from simmate.shortcuts import setup
+# from simmate.database.diffusion import Pathway as Pathway_DB
+# from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
 
-# 51, 1686, 29326
-# GOOD NEB: 77
-# BAD NEB: 1046
-pathway_id = 9504
-path = Pathway_DB.objects.get(id=pathway_id)
-get_oxi_supercell_path(path.to_pymatgen(), 10).write_path(
-    f"{pathway_id}.cif",
-    nimages=5,
-    # idpp=True,
-)
+# # 51, 1686, 29326
+# # GOOD NEB: 77
+# # BAD NEB: 1046
+# pathway_id = 9504
+# path = Pathway_DB.objects.get(id=pathway_id)
+# get_oxi_supercell_path(path.to_pymatgen(), 10).write_path(
+#     f"{pathway_id}.cif",
+#     nimages=5,
+#     # idpp=True,
+# )
 
 # import json
 # from pymatgen.core.structure import Structure
@@ -601,3 +601,58 @@ queryset = VaspCalcB.objects.filter(energy_barrier__isnull=True).all()
 390	24539
 391	4073
 392	7862
+
+
+
+
+
+
+
+
+
+# import json
+# from pymatgen.core.structure import Structure
+# from pymatgen_diffusion.neb.pathfinder import IDPPSolver
+# from simmate.shortcuts import setup
+# from simmate.database.diffusion import Pathway as Pathway_DB
+
+# path = Pathway_DB.objects.filter(structure__id="mp-1078453").first()
+
+# neb = path.vaspcalcb
+
+# def to_pmg(input_json):
+#     return Structure.from_dict(json.loads(input_json)).copy(sanitize=True)
+
+# start = to_pmg(neb.structure_start_json)
+# midpoint = to_pmg(neb.structure_midpoint_json)
+# end = to_pmg(neb.structure_end_json)
+
+# images = IDPPSolver.from_endpoints([start, midpoint], nimages=4).run()[:-1]
+# images += IDPPSolver.from_endpoints([midpoint, end], nimages=4).run()
+
+# for i, image in enumerate(images):
+#     image = image.copy(sanitize=True)
+#     image.to("poscar", f"POSCAR_{i}")
+
+# # images = start.interpolate(midpoint, nimages=4, interpolate_lattices=True)
+# # images += midpoint.interpolate(end, nimages=4, interpolate_lattices=True)[:-1]
+# from pymatgen.io.vasp.sets import MITRelaxSet
+# custom_incar = dict(
+#         ISIF=3,
+#         EDIFFG=-0.1,
+#         IBRION=2,
+#         EDIFF=1.0e-05,
+#         LDAU=False,
+#         LDAUPRINT=0,
+#         LORBIT=None,
+#         LAECHG=False,
+#         LVTOT=False,
+#         NPAR=1,
+#         ISYM=0,
+#     )
+
+# vasp_input_set = MITRelaxSet(
+#         images[0],
+#         user_incar_settings=custom_incar,
+#         user_potcar_functional="PBE",
+#     )
