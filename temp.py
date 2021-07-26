@@ -139,20 +139,20 @@ df = read_frame(
 )
 
 
-# from simmate.shortcuts import setup
-# from simmate.database.diffusion import Pathway as Pathway_DB
-# from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
+from simmate.shortcuts import setup
+from simmate.database.diffusion import Pathway as Pathway_DB
+from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
 
-# # 51, 1686, 29326
-# # GOOD NEB: 77
-# # BAD NEB: 1046
-# pathway_id = 9504
-# path = Pathway_DB.objects.get(id=pathway_id)
-# get_oxi_supercell_path(path.to_pymatgen(), 10).write_path(
-#     f"{pathway_id}.cif",
-#     nimages=5,
-#     # idpp=True,
-# )
+# 51, 1686, 29326
+# GOOD NEB: 77
+# BAD NEB: 1046
+pathway_id = 1686
+path = Pathway_DB.objects.get(id=pathway_id)
+get_oxi_supercell_path(path.to_pymatgen(), 7).write_path(
+    f"{pathway_id}.cif",
+    nimages=5,
+    # idpp=True,
+)
 
 # import json
 # from pymatgen.core.structure import Structure
@@ -237,7 +237,6 @@ queryset = VaspCalcB.objects.filter(energy_barrier__isnull=True).all()
 27	10739
 28	27926
 29	29458
-----------------
 30	13009
 31	1757
 32	3850
@@ -273,6 +272,7 @@ queryset = VaspCalcB.objects.filter(energy_barrier__isnull=True).all()
 62	31775
 63	1537
 64	20755
+----------------
 65	10737
 66	170
 67	11749
