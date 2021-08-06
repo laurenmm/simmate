@@ -98,6 +98,7 @@ from django_pandas.io import read_frame
 #
 queryset = (
     Pathway_DB.objects.filter(
+        structure__id="mp-1206711",
         # structure__nelement=4,
         # structure__formula_anonymous="AB2",
         # structure__chemical_system="Ca-F",
@@ -107,9 +108,9 @@ queryset = (
         # empiricalmeasures__dimensionality__gte=1,
         # vaspcalca__energy_barrier__gte=2.0,
         # vaspcalca__energy_barrier__lte=5,
-        vaspcalcb__energy_barrier__isnull=True,
+        # vaspcalcb__energy_barrier__isnull=True,
         # vaspcalcb__energy_barrier__gte=0.8,
-        vaspcalcb__isnull=False,
+        # vaspcalcb__isnull=False,
         # vaspcalcd__isnull=True,
     ).order_by("vaspcalca__energy_barrier")
     # BUG: distinct() doesn't work for sqlite, only postgres. also you must have
@@ -123,6 +124,7 @@ df = read_frame(
     queryset,
     fieldnames=[
         "id",
+        "length",
         "structure__formula_full",
         "structure__id",
         "structure__e_above_hull",
@@ -146,7 +148,7 @@ from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
 # 51, 1686, 29326
 # GOOD NEB: 77
 # BAD NEB: 1046
-pathway_id = 1686
+pathway_id = 103
 path = Pathway_DB.objects.get(id=pathway_id)
 get_oxi_supercell_path(path.to_pymatgen(), 7).write_path(
     f"{pathway_id}.cif",
