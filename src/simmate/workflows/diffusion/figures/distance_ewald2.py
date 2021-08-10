@@ -9,7 +9,6 @@ from simmate.database.diffusion import Pathway as Pathway_DB
 queryset = (
     Pathway_DB.objects.filter(
         vaspcalca__energy_barrier__isnull=False,
-        vaspcalca__energy_barrier__gte=0,
         empiricalmeasuresb__isnull=False,
     )
     .select_related("vaspcalca", "empiricalmeasuresb", "structure")
@@ -27,37 +26,43 @@ df = read_frame(
         "structure__spacegroup",
         "structure__formula_anonymous",
         "structure__e_above_hull",
-        "empiricalmeasuresb__ewald_energy",
+        "empiricalmeasuresb__ewald_energya",
+        "empiricalmeasuresb__ewald_energyb",
+        "empiricalmeasuresb__ewald_energyc",
+        "empiricalmeasuresb__ewald_energyd",
+        "empiricalmeasuresb__ewald_energye",
+        "empiricalmeasuresb__ewald_energyf",
+        "empiricalmeasuresb__ewald_energyg",
         "vaspcalca__energy_barrier",
     ],
 )
 
+df["test"] = df["length"] * df["empiricalmeasuresb__ewald_energyb"]
 
 # --------------------------------------------------------------------------------------
 
-
 # The code below is for interactive plotting using Plotly
-# import plotly.express as px
+import plotly.express as px
 
-# fig = px.scatter(
-#     data_frame=df,
-#     x="length",
-#     y="empiricalmeasuresb__ewald_energy",
-#     color="vaspcalca__energy_barrier",
-#     range_color=[0, 5],
-#     hover_data=[
-#         "id",
-#         "length",
-#         "structure__id",
-#         "structure__formula_full",
-#         "structure__spacegroup",
-#         "structure__formula_anonymous",
-#         "structure__e_above_hull",
-#         "empiricalmeasuresb__ewald_energy",
-#         "vaspcalca__energy_barrier",
-#     ],
-# )
-# fig.show(renderer="browser", config={'scrollZoom': True})
+fig = px.scatter(
+    data_frame=df,
+    x="empiricalmeasuresb__ewald_energyb",
+    y="vaspcalca__energy_barrier",
+    # color="vaspcalca__energy_barrier",
+    # range_color=[0, 5],
+    hover_data=[
+        "id",
+        "length",
+        "structure__id",
+        "structure__formula_full",
+        "structure__spacegroup",
+        "structure__formula_anonymous",
+        "structure__e_above_hull",
+        "empiricalmeasuresb__ewald_energya",
+        "vaspcalca__energy_barrier",
+    ],
+)
+fig.show(renderer="browser", config={'scrollZoom': True})
 
 # --------------------------------------------------------------------------------------
 
@@ -100,10 +105,11 @@ ax = fig.add_subplot(
 # create the hexbin subplot
 hb = ax.hexbin(
     x=df["length"],  # X
-    y=df["empiricalmeasuresb__ewald_energy"],  # Y
+    y=df["empiricalmeasuresb__ewald_energyb"],  # Y
     C=df["vaspcalca__energy_barrier"],  # COLOR
     gridsize=20,  # size of hex bins
     cmap="RdYlGn_r",  # color scheme for colorbar
+    vmin=0,
     vmax=7.5,  # upper limit of colorbar
     edgecolor="black",  # color between hex bins
 )
@@ -141,7 +147,7 @@ ax_histy = fig.add_subplot(
     # facecolor="lightgrey",  # background color
 )
 ax_histy.hist(
-    x=df["empiricalmeasuresb__ewald_energy"],
+    x=df["empiricalmeasuresb__ewald_energyb"],
     orientation="horizontal",
     bins=75,
     color="black",

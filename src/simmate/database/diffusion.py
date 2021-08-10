@@ -272,6 +272,15 @@ class EmpiricalMeasuresB(Calculation):
     ewald_energyd = models.FloatField(blank=True, null=True)
     ewald_energye = models.FloatField(blank=True, null=True)
     ewald_energyf = models.FloatField(blank=True, null=True)
+    ewald_energyg = models.FloatField(blank=True, null=True)
+    
+    bond_lengthx = models.FloatField(blank=True, null=True)
+    bond_lengthy = models.FloatField(blank=True, null=True)
+    bond_lengthz = models.FloatField(blank=True, null=True)
+    
+    csm_alpha = models.FloatField(blank=True, null=True)
+    csm_beta = models.FloatField(blank=True, null=True)
+    csm_gamma = models.FloatField(blank=True, null=True)
 
     # relative change in ionic radii overlaps: (Rmax-Rstart)/Rstart
     # ionic_radii_overlap_cations = models.FloatField(blank=True, null=True)

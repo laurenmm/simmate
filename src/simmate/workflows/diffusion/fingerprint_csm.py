@@ -14,6 +14,9 @@ from pymatgen.analysis.chemenv.coordination_environments.structure_environments 
     LightStructureEnvironments,
 )
 
+from pymatgen.core import Structure
+structure = Structure.from_file("Ho2CF2_mp-9006_primitive.cif")
+
 
 def get_chemenv_analysis(structure, distance_cutoff=1.4, angle_cutoff=0.3):
 
@@ -47,3 +50,8 @@ def get_chemenv_analysis(structure, distance_cutoff=1.4, angle_cutoff=0.3):
     lse = LightStructureEnvironments.from_structure_environments(
         strategy=strategy, structure_environments=se
     )
+    
+    return lse
+
+lse = get_chemenv_analysis(structure)
+print(lse.coordination_environments)

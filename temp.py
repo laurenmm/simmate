@@ -54,7 +54,7 @@ pathway_ids = (
     ).order_by("?")
     .values_list("id", flat=True)
     # .count()
-    .all()[:1000]
+    .all()[:1500]
 )
 
 client = Client(preload="simmate.configuration.dask.init_django_worker")
