@@ -257,6 +257,29 @@ class EmpiricalMeasures(Calculation):
 # --------------------------------------------------------------------------------------
 
 
+class EmpiricalMeasuresB(Calculation):
+
+    """ Base info """
+
+    # NOTE: these are actually separate calculations, but I think it's easiest
+    # to have them all in the same table. I allow blank+null for all of them
+    # just in case one of the individual calcs fail.
+
+    # relative change in ewald_energy along the pathway: (Emax-Estart)/Estart
+    ewald_energy = models.FloatField(blank=True, null=True)
+
+    # relative change in ionic radii overlaps: (Rmax-Rstart)/Rstart
+    # ionic_radii_overlap_cations = models.FloatField(blank=True, null=True)
+    # ionic_radii_overlap_anions = models.FloatField(blank=True, null=True)
+
+    """ Relationships """
+    # Each PathwayCalcs corresponds to one Pathway
+    # I set primary_key to true so that the primary keys match that of the pathway
+    pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
+
+# --------------------------------------------------------------------------------------
+
+
 class VaspCalcA(Calculation):
 
     """ Base info """
