@@ -266,7 +266,12 @@ class EmpiricalMeasuresB(Calculation):
     # just in case one of the individual calcs fail.
 
     # relative change in ewald_energy along the pathway: (Emax-Estart)/Estart
-    ewald_energy = models.FloatField(blank=True, null=True)
+    ewald_energya = models.FloatField(blank=True, null=True)
+    ewald_energyb = models.FloatField(blank=True, null=True)
+    ewald_energyc = models.FloatField(blank=True, null=True)
+    ewald_energyd = models.FloatField(blank=True, null=True)
+    ewald_energye = models.FloatField(blank=True, null=True)
+    ewald_energyf = models.FloatField(blank=True, null=True)
 
     # relative change in ionic radii overlaps: (Rmax-Rstart)/Rstart
     # ionic_radii_overlap_cations = models.FloatField(blank=True, null=True)

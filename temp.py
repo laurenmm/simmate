@@ -42,6 +42,32 @@ for pathway_id in pathway_ids:
 
 # --------------------------------------------------------------------------------------
 
+from simmate.shortcuts import setup  # ensures setup
+from simmate.database.diffusion import Pathway as Pathway_DB
+from simmate.workflows.diffusion.empirical_measures_b import workflow
+from dask.distributed import Client
+
+pathway_ids = (
+    Pathway_DB.objects.filter(
+        vaspcalca__isnull=False,
+        empiricalmeasuresb__isnull=True,
+    ).order_by("?")
+    .values_list("id", flat=True)
+    # .count()
+    .all()[:1000]
+)
+
+client = Client(preload="simmate.configuration.dask.init_django_worker")
+
+# Run the find_paths workflow for each individual id
+futures = client.map(
+    workflow.run,
+    [{"pathway_id": id} for id in pathway_ids],
+    pure=False,
+)
+
+# --------------------------------------------------------------------------------------
+
 
 # from simmate.configuration.django import setup_full  # ensures setup
 # from simmate.database.diffusion import EmpiricalMeasures
@@ -274,7 +300,6 @@ queryset = VaspCalcB.objects.filter(energy_barrier__isnull=True).all()
 62	31775
 63	1537
 64	20755
-----------------
 65	10737
 66	170
 67	11749

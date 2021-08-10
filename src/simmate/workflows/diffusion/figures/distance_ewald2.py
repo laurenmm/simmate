@@ -10,9 +10,9 @@ queryset = (
     Pathway_DB.objects.filter(
         vaspcalca__energy_barrier__isnull=False,
         vaspcalca__energy_barrier__gte=0,
-        empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
+        empiricalmeasuresb__isnull=False,
     )
-    .select_related("vaspcalca", "empiricalmeasures", "structure")
+    .select_related("vaspcalca", "empiricalmeasuresb", "structure")
     .all()
 )
 from django_pandas.io import read_frame
@@ -27,7 +27,7 @@ df = read_frame(
         "structure__spacegroup",
         "structure__formula_anonymous",
         "structure__e_above_hull",
-        "empiricalmeasures__ewald_energy",
+        "empiricalmeasuresb__ewald_energy",
         "vaspcalca__energy_barrier",
     ],
 )
@@ -42,7 +42,7 @@ df = read_frame(
 # fig = px.scatter(
 #     data_frame=df,
 #     x="length",
-#     y="empiricalmeasures__ewald_energy",
+#     y="empiricalmeasuresb__ewald_energy",
 #     color="vaspcalca__energy_barrier",
 #     range_color=[0, 5],
 #     hover_data=[
@@ -53,7 +53,7 @@ df = read_frame(
 #         "structure__spacegroup",
 #         "structure__formula_anonymous",
 #         "structure__e_above_hull",
-#         "empiricalmeasures__ewald_energy",
+#         "empiricalmeasuresb__ewald_energy",
 #         "vaspcalca__energy_barrier",
 #     ],
 # )
@@ -100,7 +100,7 @@ ax = fig.add_subplot(
 # create the hexbin subplot
 hb = ax.hexbin(
     x=df["length"],  # X
-    y=df["empiricalmeasures__ewald_energy"],  # Y
+    y=df["empiricalmeasuresb__ewald_energy"],  # Y
     C=df["vaspcalca__energy_barrier"],  # COLOR
     gridsize=20,  # size of hex bins
     cmap="RdYlGn_r",  # color scheme for colorbar
@@ -141,7 +141,7 @@ ax_histy = fig.add_subplot(
     # facecolor="lightgrey",  # background color
 )
 ax_histy.hist(
-    x=df["empiricalmeasures__ewald_energy"],
+    x=df["empiricalmeasuresb__ewald_energy"],
     orientation="horizontal",
     bins=75,
     color="black",
