@@ -28,6 +28,20 @@ df = read_frame(
     ],
 )
 
+# --------------------------------------------------------------------------------------
+
+
+# The code below is for interactive plotting using Plotly
+# import plotly.express as px
+
+# fig = px.scatter(
+#     data_frame=df,
+#     x="empiricalmeasures__ionic_radii_overlap_anions",
+#     y="empiricalmeasures__ionic_radii_overlap_cations",
+#     color="vaspcalca__energy_barrier",
+#     range_color=[0, 5],
+# )
+# fig.show(renderer="browser", config={'scrollZoom': True})
 
 # --------------------------------------------------------------------------------------
 

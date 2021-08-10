@@ -33,36 +33,42 @@ df = read_frame(
         "empiricalmeasuresb__ewald_energye",
         "empiricalmeasuresb__ewald_energyf",
         "empiricalmeasuresb__ewald_energyg",
+        "empiricalmeasuresb__bond_lengthx",
+        "empiricalmeasuresb__bond_lengthy",
+        "empiricalmeasuresb__bond_lengthz",
+        "empiricalmeasuresb__csm_alpha",
+        "empiricalmeasuresb__csm_beta",
+        "empiricalmeasuresb__csm_gamma",
         "vaspcalca__energy_barrier",
     ],
 )
 
-df["test"] = df["length"] * df["empiricalmeasuresb__ewald_energyb"]
+df["test"] = df["length"] * df["empiricalmeasuresb__bond_lengthx"]
 
 # --------------------------------------------------------------------------------------
 
 # The code below is for interactive plotting using Plotly
-import plotly.express as px
+# import plotly.express as px
 
-fig = px.scatter(
-    data_frame=df,
-    x="empiricalmeasuresb__ewald_energyb",
-    y="vaspcalca__energy_barrier",
-    # color="vaspcalca__energy_barrier",
-    # range_color=[0, 5],
-    hover_data=[
-        "id",
-        "length",
-        "structure__id",
-        "structure__formula_full",
-        "structure__spacegroup",
-        "structure__formula_anonymous",
-        "structure__e_above_hull",
-        "empiricalmeasuresb__ewald_energya",
-        "vaspcalca__energy_barrier",
-    ],
-)
-fig.show(renderer="browser", config={'scrollZoom': True})
+# fig = px.scatter(
+#     data_frame=df,
+#     x="empiricalmeasuresb__ewald_energyb",
+#     y="vaspcalca__energy_barrier",
+#     # color="empiricalmeasuresb__bond_lengthx",
+#     # range_color=[0, 5],
+#     hover_data=[
+#         "id",
+#         "length",
+#         "structure__id",
+#         "structure__formula_full",
+#         "structure__spacegroup",
+#         "structure__formula_anonymous",
+#         "structure__e_above_hull",
+#         "empiricalmeasuresb__ewald_energya",
+#         "vaspcalca__energy_barrier",
+#     ],
+# )
+# fig.show(renderer="browser", config={'scrollZoom': True})
 
 # --------------------------------------------------------------------------------------
 

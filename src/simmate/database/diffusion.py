@@ -17,7 +17,7 @@ from simmate.database.base import Structure, Calculation
 
 class MaterialsProjectStructure(Structure):
 
-    """ Base Info """
+    """Base Info"""
 
     # Materials Project ID
     # For now, max length of 12 is overkill: 'mp-123456789'
@@ -78,7 +78,7 @@ class MaterialsProjectStructure(Structure):
 
 class Pathway(models.Model):
 
-    """ Base info """
+    """Base info"""
 
     # The element of the diffusion atom
     # Note: do not confuse this with ion, which has charge
@@ -228,7 +228,7 @@ class Pathway(models.Model):
 
 class EmpiricalMeasures(Calculation):
 
-    """ Base info """
+    """Base info"""
 
     # NOTE: these are actually separate calculations, but I think it's easiest
     # to have them all in the same table. I allow blank+null for all of them
@@ -259,7 +259,7 @@ class EmpiricalMeasures(Calculation):
 
 class EmpiricalMeasuresB(Calculation):
 
-    """ Base info """
+    """Base info"""
 
     # NOTE: these are actually separate calculations, but I think it's easiest
     # to have them all in the same table. I allow blank+null for all of them
@@ -273,11 +273,11 @@ class EmpiricalMeasuresB(Calculation):
     ewald_energye = models.FloatField(blank=True, null=True)
     ewald_energyf = models.FloatField(blank=True, null=True)
     ewald_energyg = models.FloatField(blank=True, null=True)
-    
+
     bond_lengthx = models.FloatField(blank=True, null=True)
     bond_lengthy = models.FloatField(blank=True, null=True)
     bond_lengthz = models.FloatField(blank=True, null=True)
-    
+
     csm_alpha = models.FloatField(blank=True, null=True)
     csm_beta = models.FloatField(blank=True, null=True)
     csm_gamma = models.FloatField(blank=True, null=True)
@@ -291,12 +291,14 @@ class EmpiricalMeasuresB(Calculation):
     # I set primary_key to true so that the primary keys match that of the pathway
     pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
 
+
 # --------------------------------------------------------------------------------------
 
 
 class VaspCalcA(Calculation):
 
-    """ Base info """
+    """Base info"""
+
     energy_start = models.FloatField(blank=True, null=True)
     energy_midpoint = models.FloatField(blank=True, null=True)
     energy_end = models.FloatField(blank=True, null=True)
@@ -307,18 +309,19 @@ class VaspCalcA(Calculation):
     # Each calc corresponds to one Pathway
     # I set primary_key to true so that the primary keys match that of the pathway
     pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
+
 
 # --------------------------------------------------------------------------------------
 
 
 class VaspCalcB(Calculation):
 
-    """ Base info """
-    
+    """Base info"""
+
     structure_start_json = models.TextField(blank=True, null=True)
     structure_midpoint_json = models.TextField(blank=True, null=True)
     structure_end_json = models.TextField(blank=True, null=True)
-    
+
     energy_start = models.FloatField(blank=True, null=True)
     energy_midpoint = models.FloatField(blank=True, null=True)
     energy_end = models.FloatField(blank=True, null=True)
@@ -329,105 +332,107 @@ class VaspCalcB(Calculation):
     # Each calc corresponds to one Pathway
     # I set primary_key to true so that the primary keys match that of the pathway
     pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
+
 
 # --------------------------------------------------------------------------------------
 
 
 class VaspCalcC(Calculation):
 
-    """ Base info """
-    
+    """Base info"""
+
     structure_start_json = models.TextField(blank=True, null=True)
     structure_midpoint_json = models.TextField(blank=True, null=True)
     structure_end_json = models.TextField(blank=True, null=True)
-    
+
     energy_start = models.FloatField(blank=True, null=True)
     energy_midpoint = models.FloatField(blank=True, null=True)
     energy_end = models.FloatField(blank=True, null=True)
-    
+
     converged_start = models.BooleanField(blank=True, null=True)
     converged_midpoint = models.BooleanField(blank=True, null=True)
     converged_end = models.BooleanField(blank=True, null=True)
-    
+
     forces_start_json = models.TextField(blank=True, null=True)
     forces_midpoint_json = models.TextField(blank=True, null=True)
     forces_end_json = models.TextField(blank=True, null=True)
-    
+
     stress_start_json = models.TextField(blank=True, null=True)
     stress_midpoint_json = models.TextField(blank=True, null=True)
     stress_end_json = models.TextField(blank=True, null=True)
-    
+
     energysteps_start_json = models.TextField(blank=True, null=True)
     energysteps_midpoint_json = models.TextField(blank=True, null=True)
     energysteps_end_json = models.TextField(blank=True, null=True)
-    
+
     energy_barrier = models.FloatField(blank=True, null=True)
 
     """ Relationships """
     # Each calc corresponds to one Pathway
     # I set primary_key to true so that the primary keys match that of the pathway
     pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
-    
+
     """ Properties """
     # These only exist because I'm storing lists as json above. So I was lazy to
     # take a shortcut above -- and I need to add this extra functionality here as
     # a result.
-    
+
     @property
     def forces_start(self):
         return json.loads(self.forces_start_json)
-    
+
     @property
     def forces_midpoint(self):
         return json.loads(self.forces_midpoint_json)
-    
+
     @property
     def forces_end(self):
         return json.loads(self.forces_end_json)
-    
+
     @property
     def stress_start(self):
         return json.loads(self.stress_start_json)
-    
+
     @property
     def stress_midpoint(self):
         return json.loads(self.stress_midpoint_json)
-    
+
     @property
     def stress_end(self):
         return json.loads(self.stress_end_json)
-    
+
     @property
     def energysteps_start(self):
         return json.loads(self.energysteps_start_json)
-    
+
     @property
     def energysteps_midpoint(self):
         return json.loads(self.energysteps_midpoint_json)
-    
+
     @property
     def energysteps_end(self):
         return json.loads(self.energysteps_end_json)
-    
+
+
 # --------------------------------------------------------------------------------------
 
 
 class VaspCalcD(Calculation):
 
-    """ Base info """
-    
+    """Base info"""
+
     structure_start_json = models.TextField(blank=True, null=True)
     structure_midpoint_json = models.TextField(blank=True, null=True)
     structure_end_json = models.TextField(blank=True, null=True)
-    
+
     forces_start_json = models.TextField(blank=True, null=True)
     forces_midpoint_json = models.TextField(blank=True, null=True)
     forces_end_json = models.TextField(blank=True, null=True)
-    
+
     stress_start_json = models.TextField(blank=True, null=True)
     stress_midpoint_json = models.TextField(blank=True, null=True)
     stress_end_json = models.TextField(blank=True, null=True)
-    
+
     energysteps_start_json = models.TextField(blank=True, null=True)
     energysteps_midpoint_json = models.TextField(blank=True, null=True)
     energysteps_end_json = models.TextField(blank=True, null=True)
@@ -435,7 +440,7 @@ class VaspCalcD(Calculation):
     timesteps_start_json = models.TextField(blank=True, null=True)
     timesteps_midpoint_json = models.TextField(blank=True, null=True)
     timesteps_end_json = models.TextField(blank=True, null=True)
-    
+
     error_time_start = models.FloatField(blank=True, null=True)
     error_time_midpoint = models.FloatField(blank=True, null=True)
     error_time_end = models.FloatField(blank=True, null=True)

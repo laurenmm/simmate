@@ -54,13 +54,13 @@ pathway_ids = (
     ).order_by("?")
     .values_list("id", flat=True)
     # .count()
-    .all()[:1500]
+    .all()
 )
 
 client = Client(preload="simmate.configuration.dask.init_django_worker")
 
 # Run the find_paths workflow for each individual id
-futures = client.map(
+client.map(
     workflow.run,
     [{"pathway_id": id} for id in pathway_ids],
     pure=False,
