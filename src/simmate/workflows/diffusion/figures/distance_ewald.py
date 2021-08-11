@@ -9,8 +9,8 @@ from simmate.database.diffusion import Pathway as Pathway_DB
 queryset = (
     Pathway_DB.objects.filter(
         vaspcalca__energy_barrier__isnull=False,
-        vaspcalca__energy_barrier__gte=0,
-        empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
+        # vaspcalca__energy_barrier__gte=0,
+        # empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
     )
     .select_related("vaspcalca", "empiricalmeasures", "structure")
     .all()
@@ -104,6 +104,7 @@ hb = ax.hexbin(
     C=df["vaspcalca__energy_barrier"],  # COLOR
     gridsize=20,  # size of hex bins
     cmap="RdYlGn_r",  # color scheme for colorbar
+    vmin=0,
     vmax=7.5,  # upper limit of colorbar
     edgecolor="black",  # color between hex bins
 )

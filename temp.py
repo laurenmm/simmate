@@ -44,13 +44,13 @@ for pathway_id in pathway_ids:
 
 from simmate.shortcuts import setup  # ensures setup
 from simmate.database.diffusion import Pathway as Pathway_DB
-from simmate.workflows.diffusion.empirical_measures_b import workflow
+from simmate.workflows.diffusion.empirical_measures_c import workflow
 from dask.distributed import Client
 
 pathway_ids = (
     Pathway_DB.objects.filter(
         vaspcalca__isnull=False,
-        empiricalmeasuresb__isnull=True,
+        empiricalmeasuresc__isnull=True,
     ).order_by("?")
     .values_list("id", flat=True)
     # .count()
@@ -66,8 +66,13 @@ client.map(
     pure=False,
 )
 
-# --------------------------------------------------------------------------------------
+# workflow.run(pathway_id=203)
+# from simmate.shortcuts import setup  # ensures setup
+# from simmate.database.diffusion import EmpiricalMeasuresC
+# queryset = EmpiricalMeasuresC.objects.all()
+# queryset.delete()
 
+# --------------------------------------------------------------------------------------
 
 # from simmate.configuration.django import setup_full  # ensures setup
 # from simmate.database.diffusion import EmpiricalMeasures
@@ -124,10 +129,10 @@ from django_pandas.io import read_frame
 #
 queryset = (
     Pathway_DB.objects.filter(
-        structure__id="mp-1209185",
+        # structure__id="mp-1209185",
         # structure__nelement=4,
         # structure__formula_anonymous="AB2",
-        # structure__chemical_system="C-F-Ho",
+        structure__chemical_system="Be-F",
         # structure__spacegroup=225,
         # nsites_777__lte=100,
         # structure__e_above_hull=0,
@@ -231,6 +236,33 @@ queryset = VaspCalcB.objects.filter(energy_barrier__isnull=True).all()
 # queryset = VaspCalcA.objects.filter(status="S", updated_at__gte=datetime.date(2021,4,26)).all()
 # from django_pandas.io import read_frame
 # df = read_frame(queryset)
+
+# To exclude any U-parameter type elements
+# from django.db.models import Q
+# import functools
+# .exclude(
+#     functools.reduce(
+#         lambda x, y: x | y,
+#         [
+#             Q(structure__formula_full__contains=e)
+#             for e in [
+#                 "Ag",
+#                 "Co",
+#                 "Cr",
+#                 "Cu",
+#                 "Fe",
+#                 "Mn",
+#                 "Mo",
+#                 "Nb",
+#                 "Ni",
+#                 "Re",
+#                 "Ta",
+#                 "V",
+#                 "W",
+#             ]
+#         ],
+#     )
+# )
 
 
 # These are the pathways that failed for NEB and I am retrying

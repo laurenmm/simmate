@@ -83,7 +83,7 @@ def get_ewald_energy(path):
         # NOTE: requires oxidation state decorated structure
         ewald_energies.append(ewald_energy)
         ewald_forces.append(ewald_force)
-
+    
     # These are a series of different measures that I'm testing
     a = (ewald_energies[1] - ewald_energies[0]) / abs(ewald_energies[0])
     b = ewald_energies[1] - ewald_energies[0]

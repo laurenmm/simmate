@@ -143,13 +143,13 @@ df = read_frame(
 
 # VISUALIZE PATHWAY
 
-pathway_id = 3376
+pathway_id = 18557
 path = Pathway_DB.objects.get(id=pathway_id)
 path_py = get_oxi_supercell_path(path.to_pymatgen(), 7, oxi=True)
 path_py.write_path(
     f"{pathway_id}.cif",
     nimages=5,
-    # idpp=True,
+    idpp=True,
 )
 
 # # original
