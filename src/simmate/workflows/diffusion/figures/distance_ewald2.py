@@ -48,27 +48,27 @@ df["test"] = df["length"] * df["empiricalmeasuresb__bond_lengthx"]
 # --------------------------------------------------------------------------------------
 
 # The code below is for interactive plotting using Plotly
-# import plotly.express as px
+import plotly.express as px
 
-# fig = px.scatter(
-#     data_frame=df,
-#     x="empiricalmeasuresb__ewald_energyb",
-#     y="vaspcalca__energy_barrier",
-#     # color="empiricalmeasuresb__bond_lengthx",
-#     # range_color=[0, 5],
-#     hover_data=[
-#         "id",
-#         "length",
-#         "structure__id",
-#         "structure__formula_full",
-#         "structure__spacegroup",
-#         "structure__formula_anonymous",
-#         "structure__e_above_hull",
-#         "empiricalmeasuresb__ewald_energya",
-#         "vaspcalca__energy_barrier",
-#     ],
-# )
-# fig.show(renderer="browser", config={'scrollZoom': True})
+fig = px.scatter(
+    data_frame=df,
+    x="empiricalmeasuresb__ewald_energyb",
+    y="vaspcalca__energy_barrier",
+    # color="empiricalmeasuresb__bond_lengthx",
+    # range_color=[0, 5],
+    hover_data=[
+        "id",
+        "length",
+        "structure__id",
+        "structure__formula_full",
+        "structure__spacegroup",
+        "structure__formula_anonymous",
+        "structure__e_above_hull",
+        "empiricalmeasuresb__ewald_energya",
+        "vaspcalca__energy_barrier",
+    ],
+)
+fig.show(renderer="browser", config={'scrollZoom': True})
 
 # --------------------------------------------------------------------------------------
 

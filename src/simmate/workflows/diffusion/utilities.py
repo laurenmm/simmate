@@ -34,11 +34,17 @@ from custodian.vasp.validators import VasprunXMLValidator, VaspFilesValidator
 # --------------------------------------------------------------------------------------
 
 
-def get_oxi_supercell_path(path, min_sl_v=None, oxi=False):
+def get_oxi_supercell_path(path, min_sl_v=None, oxi=False, new_oxi=False):
 
     if oxi:
         # add oxidation states to structure
-        structure = ValenceIonicRadiusEvaluator(path.symm_structure).structure
+        if new_oxi:
+            # new alternative method
+            structure = path.symm_structure
+            structure.add_oxidation_state_by_guess()
+        else:
+            # original estimation of oxidation states
+            structure = ValenceIonicRadiusEvaluator(path.symm_structure).structure
     else:
         structure = path.symm_structure
 

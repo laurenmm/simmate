@@ -143,13 +143,27 @@ df = read_frame(
 
 # VISUALIZE PATHWAY
 
-pathway_id = 24641
+pathway_id = 3376
 path = Pathway_DB.objects.get(id=pathway_id)
-get_oxi_supercell_path(path.to_pymatgen(), 7).write_path(
+path_py = get_oxi_supercell_path(path.to_pymatgen(), 7, oxi=True)
+path_py.write_path(
     f"{pathway_id}.cif",
     nimages=5,
     # idpp=True,
 )
+
+# # original
+# print(path_py.symm_structure.composition.reduced_formula)
+# print(path_py.symm_structure.composition.elements)
+
+# # using composition
+# print(path_py.symm_structure.composition.add_charges_from_oxi_state_guesses().elements)
+# path_py.symm_structure.composition.oxi_state_guesses()
+
+# # using structure (maps to composition)
+# s = path_py.symm_structure
+# s.add_oxidation_state_by_guess()
+# print(s.composition.elements)
 
 # --------------------------------------------------------------------------------------
 

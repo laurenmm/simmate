@@ -295,6 +295,43 @@ class EmpiricalMeasuresB(Calculation):
 # --------------------------------------------------------------------------------------
 
 
+class EmpiricalMeasuresC(Calculation):
+
+    """Base info"""
+
+    # NOTE: these are actually separate calculations, but I think it's easiest
+    # to have them all in the same table. I allow blank+null for all of them
+    # just in case one of the individual calcs fail.
+
+    # relative change in ewald_energy along the pathway: (Emax-Estart)/Estart
+    ewald_energya = models.FloatField(blank=True, null=True)
+    ewald_energyb = models.FloatField(blank=True, null=True)
+    ewald_energyc = models.FloatField(blank=True, null=True)
+    ewald_energyd = models.FloatField(blank=True, null=True)
+    ewald_energye = models.FloatField(blank=True, null=True)
+    ewald_energyf = models.FloatField(blank=True, null=True)
+    ewald_energyg = models.FloatField(blank=True, null=True)
+
+    bond_lengthx = models.FloatField(blank=True, null=True)
+    bond_lengthy = models.FloatField(blank=True, null=True)
+    bond_lengthz = models.FloatField(blank=True, null=True)
+
+    csm_alpha = models.FloatField(blank=True, null=True)
+    csm_beta = models.FloatField(blank=True, null=True)
+    csm_gamma = models.FloatField(blank=True, null=True)
+
+    # relative change in ionic radii overlaps: (Rmax-Rstart)/Rstart
+    # ionic_radii_overlap_cations = models.FloatField(blank=True, null=True)
+    # ionic_radii_overlap_anions = models.FloatField(blank=True, null=True)
+
+    """ Relationships """
+    # Each PathwayCalcs corresponds to one Pathway
+    # I set primary_key to true so that the primary keys match that of the pathway
+    pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
+
+# --------------------------------------------------------------------------------------
+
+
 class VaspCalcA(Calculation):
 
     """Base info"""
