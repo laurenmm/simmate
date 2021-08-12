@@ -93,11 +93,11 @@ def get_ewald_energy(path):
     f = ewald_energies[0] / image.num_sites
     g = ewald_energies[1] / image.num_sites
 
-    # d = ewald_forces[1] - ewald_forces[0]
-    # e = (ewald_forces[1] - ewald_forces[0]) / abs(ewald_forces[0])
-    # f = (ewald_forces[1] - ewald_forces[0]) / image.num_sites
+    h = ewald_forces[1] - ewald_forces[0]
+    i = (ewald_forces[1] - ewald_forces[0]) / abs(ewald_forces[0])
+    j = (ewald_forces[1] - ewald_forces[0]) / image.num_sites
 
-    return a, b, c, d, e, f, g
+    return a, b, c, d, e, f, g, h, i, j
 
 
 # --------------------------------------------------------------------------------------
@@ -205,7 +205,7 @@ def get_ideal_env_measure(path, distance_cutoff=1.4, angle_cutoff=0.3):
 def add_empiricalmeasures_to_db(pathway_id, ewald_data, bondlen_data, csm_data):
 
     # unpack data from all my different versions above.
-    a, b, c, d, e, f, g = ewald_data
+    a, b, c, d, e, f, g, h, i, j = ewald_data
 
     x, y, z = bondlen_data
     
@@ -228,6 +228,9 @@ def add_empiricalmeasures_to_db(pathway_id, ewald_data, bondlen_data, csm_data):
         ewald_energye=e if not isinstance(e, Exception) else None,
         ewald_energyf=f if not isinstance(f, Exception) else None,
         ewald_energyg=g if not isinstance(g, Exception) else None,
+        ewald_energyh=h if not isinstance(h, Exception) else None,
+        ewald_energyi=i if not isinstance(i, Exception) else None,
+        ewald_energyj=j if not isinstance(j, Exception) else None,
         #
         bond_lengthx=x if not isinstance(x, Exception) else None,
         bond_lengthy=y if not isinstance(y, Exception) else None,

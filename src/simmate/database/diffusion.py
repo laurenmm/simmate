@@ -311,6 +311,9 @@ class EmpiricalMeasuresC(Calculation):
     ewald_energye = models.FloatField(blank=True, null=True)
     ewald_energyf = models.FloatField(blank=True, null=True)
     ewald_energyg = models.FloatField(blank=True, null=True)
+    ewald_energyh = models.FloatField(blank=True, null=True)
+    ewald_energyi = models.FloatField(blank=True, null=True)
+    ewald_energyj = models.FloatField(blank=True, null=True)
 
     bond_lengthx = models.FloatField(blank=True, null=True)
     bond_lengthy = models.FloatField(blank=True, null=True)
