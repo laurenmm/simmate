@@ -493,3 +493,15 @@ class VaspCalcD(Calculation):
     # Each calc corresponds to one Pathway
     # I set primary_key to true so that the primary keys match that of the pathway
     pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
+
+
+# --------------------------------------------------------------------------------------
+
+
+class Prototype(models.Model):
+    name = models.CharField(max_length=75, blank=True, null=True)
+    formula_reduced = models.CharField(max_length=50, blank=True, null=True)
+    structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "diffusion"
