@@ -45,3 +45,25 @@ df = read_frame(
         "empiricalmeasures__dimensionality_cumlengths",
     ],
 )
+
+
+from simmate.shortcuts import setup
+from simmate.database.diffusion import MaterialsProjectStructure
+from django_pandas.io import read_frame
+
+structures = MaterialsProjectStructure.objects.filter(
+    prototype__formula_reduced__isnull=False
+).all()
+
+df = read_frame(
+    structures,
+    fieldnames=[
+        "id",
+        "formula_full",
+        "id",
+        "e_above_hull",
+        "prototype__name",
+        "prototype__formula_reduced",
+    ],
+)
+

@@ -505,3 +505,12 @@ class Prototype(models.Model):
 
     class Meta:
         app_label = "diffusion"
+
+
+class Prototype2(models.Model):
+    name = models.CharField(max_length=75, blank=True, null=True)
+    formula_reduced = models.CharField(max_length=50, blank=True, null=True)
+    structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "diffusion"

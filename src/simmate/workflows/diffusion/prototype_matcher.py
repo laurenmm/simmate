@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from pymatgen.analysis.prototypes import AflowPrototypeMatcher
+from simmate.workflows.diffusion.prototype_matcher_fork import AflowPrototypeMatcher
+# from pymatgen.analysis.prototypes import AflowPrototypeMatcher
 
 
 from prefect import Flow, Parameter, task
 from simmate.configuration.django import setup_full  # ensures setup
 from simmate.database.diffusion import (
     MaterialsProjectStructure as MPStructure,
-    Prototype,
+    Prototype2 as Prototype, # !!! 
 )
 
 
@@ -59,7 +60,7 @@ with Flow("PrototypeMatcher") as workflow:
 
 # client = Client(preload="simmate.configuration.dask.init_django_worker")
 # structure_ids = (
-#     MPStructure.objects.filter(prototype__isnull=True)
+#     MPStructure.objects.filter(prototype2__isnull=True)
 #     .values_list("id", flat=True)
 #     .all()
 # )
