@@ -12,7 +12,7 @@ from django_pandas.io import read_frame
 
 queryset = MaterialsProjectStructure.objects.filter(
     prototype2__formula_reduced__isnull=True
-).all()[:100]
+).all()
 
 df = read_frame(
     queryset,
@@ -29,11 +29,13 @@ df = read_frame(
 structures = [s.to_pymatgen() for s in queryset]
 
 from pymatgen.analysis.structure_matcher import StructureMatcher
+from simmate.database.diffusion import Prototype3
 
 matcher = StructureMatcher(attempt_supercell=False)
 # result = matcher.group_structures(structures, anonymous=True)
 
 from tqdm import tqdm
+
 matching_groups = []
 group_ids = []
 for structure, db_entry in tqdm(zip(structures, queryset)):
@@ -44,10 +46,15 @@ for structure, db_entry in tqdm(zip(structures, queryset)):
             found_match = True
             group.append(structure)
             group_ids.append(index)
+
+            p = Prototype3(structure=db_entry, number=index)
+            p.save()
+
             break
-    
+
     if not found_match:
         next_index = len(matching_groups)
         group_ids.append(next_index)
         matching_groups.append([structure])
-
+        p = Prototype3(structure=db_entry, number=next_index)
+        p.save()

@@ -497,7 +497,7 @@ class VaspCalcD(Calculation):
 
 # --------------------------------------------------------------------------------------
 
-
+# This uses AFLOW prototypes in pymatgen (so only 288)
 class Prototype(models.Model):
     name = models.CharField(max_length=75, blank=True, null=True)
     formula_reduced = models.CharField(max_length=50, blank=True, null=True)
@@ -507,9 +507,19 @@ class Prototype(models.Model):
         app_label = "diffusion"
 
 
+# This uses AFLOW prototypes with >1000 used
 class Prototype2(models.Model):
     name = models.CharField(max_length=75, blank=True, null=True)
     formula_reduced = models.CharField(max_length=50, blank=True, null=True)
+    structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "diffusion"
+
+
+# This my custom matching
+class Prototype3(models.Model):
+    number = models.IntegerField(blank=True, null=True)
     structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
 
     class Meta:
