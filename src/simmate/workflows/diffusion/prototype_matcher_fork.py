@@ -108,6 +108,7 @@ class AflowPrototypeMatcher:
             ltol=self.initial_ltol,
             stol=self.initial_stol,
             angle_tol=self.initial_angle_tol,
+            # attempt_supercell=True, ################# Should this be done? -jacksund
         )
         tags = self._match_prototype(sm, structure)
         while len(tags) > 1:
