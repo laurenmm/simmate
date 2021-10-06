@@ -10,6 +10,7 @@ queryset = (
         structure__prototype2__formula_reduced__isnull=False,
         vaspcalca__energy_barrier__gte=-1,
         vaspcalca__energy_barrier__lte=1,
+        # structure__prototype2__name="Matlockite",
     )
     .order_by(
         "structure__id",
@@ -23,6 +24,7 @@ queryset = (
 # queryset = (
 #     Pathway_DB.objects.filter(
 #         structure__chemical_system="F-La",
+#         structure__formula_reduced="LaF3",
 #     )
 #     .order_by("structure__id", "vaspcalca__energy_barrier")
 #     # BUG: distinct() doesn't work for sqlite, only postgres. also you must have
@@ -49,4 +51,4 @@ df = read_frame(
     ],
 )
 
-df.to_csv("prototypes-1050_less-than-1eV-approx-barrier_one-path-per-structure.csv")
+# df.to_csv("prototypes-1050_less-than-1eV-approx-barrier_one-path-per-structure.csv")
