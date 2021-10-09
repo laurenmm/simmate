@@ -147,13 +147,12 @@ df["vaspcalcd__forces_norm_end"] = df.vaspcalcd__forces_end.apply(numpy_util)
 
 # This is useful a couple places below
 df["error_static"] = [
-    pathway_barriers[0]
-    if pathway_barriers else numpy.NAN
-    for pathway_barriers in df.vaspcalcd__energysteps_barrier_errors   
+    pathway_barriers[0] if pathway_barriers else numpy.NAN
+    for pathway_barriers in df.vaspcalcd__energysteps_barrier_errors
 ]
 
 # N_SITES Experimental
-df["nsites_777_^-3"] = df.nsites_777.apply(lambda x: x**-3)
+df["nsites_777_^-3"] = df.nsites_777.apply(lambda x: x ** -(1 / 3))
 
 # --------------------------------------------------------------------------------------
 
@@ -186,7 +185,7 @@ for image in ["start", "midpoint", "end"]:
             print(c, convergence)  # !!! THIS WILL REPORT ANY UNCONVERGED CALCS
         energies.append(energysteps[i + 1])
         forces.append(forcesteps[i + 1])
-        times.append(sum(forcesteps[:i + 1]))
+        times.append(sum(forcesteps[: i + 1]))
     df[f"energy_{image}_{convergence}"] = energies
     df[f"force_{image}_{convergence}"] = forces
 
@@ -220,30 +219,65 @@ df[f"error_{convergence}"] = errors
 
 # --------------------------------------------------------------------------------------
 
-# OUTLIER DETECTION
+# ERROR STATS AND OUTLIER DETECTION
 
 # For the static calcs
-all_errors_static = df[f"error_static"].dropna().to_numpy()
+all_errors_static = df["error_static"].dropna().to_numpy()
 median_error_static = numpy.median(all_errors_static)
 std_error_static = numpy.std(all_errors_static)
-df[f"is_outlier_static"] = [
+df["is_outlier_static"] = [
     bool(abs(error - median_error_static) > (3 * std_error_static))
     for error in df["error_static"]
 ]
+print(
+    f"The error (median +/- stdev) for STATIC: {median_error_static} +/- {std_error_static}"
+)
 
 # For the relax dataset
 all_errors = df[f"error_{convergence}"].dropna().to_numpy()
-median_error = numpy.median(all_errors)
-std_error = numpy.std(all_errors)
-
+median_error_relax = numpy.median(all_errors)
+std_error_relax = numpy.std(all_errors)
 df[f"is_outlier_{convergence}"] = [
-    bool(abs(error - median_error) > (3 * std_error))
+    bool(abs(error - median_error_relax) > (3 * std_error_relax))
     for error in df[f"error_{convergence}"]
 ]
+print(
+    f"The error (median +/- stdev) for RELAX: {median_error_relax} +/- {std_error_relax}"
+)
 
 # UNCOMMENT IF YOU WANT TO REMOVE!
 # df = df[df["is_outlier_static"] == False]
 # df = df[df[f"is_outlier_{convergence}"] == False]
+
+# --------------------------------------------------------------------------------------
+
+# LINEAR REGRESSION FOR STATIC AND RELAX
+
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
+
+reg_static = linear_model.LinearRegression()
+fields_to_fit = ["vaspcalca__energy_barrier"]
+data = df[fields_to_fit + ["vaspcalcb__energy_barrier"]].dropna()
+X_train = data[fields_to_fit]
+y_train = data["vaspcalcb__energy_barrier"]
+reg_static.fit(X_train, y_train)
+print(
+    list(reg_static.coef_) + [reg_static.intercept_]
+)  # List of coefficients for each field
+print(reg_static.score(X_train, y_train))  # R^2
+
+reg_relax = linear_model.LinearRegression()
+fields_to_fit = [f"barrier_{convergence}"]
+data = df[fields_to_fit + ["vaspcalcb__energy_barrier"]].dropna()
+X_train = data[fields_to_fit]
+y_train = data["vaspcalcb__energy_barrier"]
+reg_relax.fit(X_train, y_train)
+print(
+    list(reg_relax.coef_) + [reg_relax.intercept_]
+)  # List of coefficients for each field
+print(reg_relax.score(X_train, y_train))  # R^2
+
 
 # --------------------------------------------------------------------------------------
 
@@ -252,7 +286,7 @@ df[f"is_outlier_{convergence}"] = [
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 
-reg = linear_model.LinearRegression()
+reg_static_emp = linear_model.LinearRegression()
 # reg = linear_model.Lasso(alpha=0.1)
 
 # split our dataframe into training and test sets
@@ -261,30 +295,31 @@ reg = linear_model.LinearRegression()
 
 # Fields to use in fitting
 fields_to_fit = [
-    # "length",
-    # "nsites_777",
-    # "structure__e_above_hull",
-    "nsites_777_^-3",
-    # "empiricalmeasures__ewald_energy",
     "vaspcalca__energy_barrier",
+    "nsites_777_^-3",
 ]
 
 data = df[fields_to_fit + ["vaspcalcb__energy_barrier"]].dropna()
 
 X_train = data[fields_to_fit]
 y_train = data["vaspcalcb__energy_barrier"]
-reg.fit(X_train, y_train)
-print(list(reg.coef_) + [reg.intercept_])  # List of coefficients for each field
-print(reg.score(X_train, y_train))  # R^2
+reg_static_emp.fit(X_train, y_train)
+print(
+    list(reg_static_emp.coef_) + [reg_static_emp.intercept_]
+)  # List of coefficients for each field
+print(reg_static_emp.score(X_train, y_train))  # R^2
 
 
 # Now use our test set to see how the model does
 X_test = data[fields_to_fit]
 y_test1_expected = data["vaspcalcb__energy_barrier"]
-y_test1_predicted = reg.predict(X_test)
+y_test1_predicted = reg_static_emp.predict(X_test)
 y_test1_errors = y_test1_predicted - y_test1_expected
 y_test1_std = numpy.std(y_test1_errors)
 y_test1_median = numpy.median(y_test1_errors)
+print(
+    f"The error (median +/- stdev) for STATIC+EMP: {y_test1_median} +/- {y_test1_std}"
+)
 
 # --------------------------------------------------------------------------------------
 
@@ -293,7 +328,7 @@ y_test1_median = numpy.median(y_test1_errors)
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 
-reg = linear_model.LinearRegression()
+reg_relax_emp = linear_model.LinearRegression()
 # reg = linear_model.Lasso(alpha=0.1)
 
 # split our dataframe into training and test sets
@@ -302,33 +337,63 @@ reg = linear_model.LinearRegression()
 
 # Fields to use in fitting
 fields_to_fit = [
-    # "length",
-    # "nsites_777",
+    f"barrier_{convergence}",
     f"force_{convergence}",
     "nsites_777_^-3",
-    # "structure__e_above_hull",
-    # "empiricalmeasures__ewald_energy",
-    f"barrier_{convergence}",
 ]
 
 data = df[fields_to_fit + ["vaspcalcb__energy_barrier"]].dropna()
 
 X_train = data[fields_to_fit]
 y_train = data["vaspcalcb__energy_barrier"]
-reg.fit(X_train, y_train)
-print(list(reg.coef_) + [reg.intercept_])  # List of coefficients for each field
-print(reg.score(X_train, y_train))  # R^2
+reg_relax_emp.fit(X_train, y_train)
+print(
+    list(reg_relax_emp.coef_) + [reg_relax_emp.intercept_]
+)  # List of coefficients for each field
+print(reg_relax_emp.score(X_train, y_train))  # R^2
 
 
 # Now use our test set to see how the model does
 X_test = data[fields_to_fit]
 y_test2_expected = data["vaspcalcb__energy_barrier"]
-y_test2_predicted = reg.predict(X_test)
+y_test2_predicted = reg_relax_emp.predict(X_test)
 y_test2_errors = y_test2_predicted - y_test2_expected
 y_test2_std = numpy.std(y_test2_errors)
 y_test2_median = numpy.median(y_test2_errors)
+print(
+    f"The error (median +/- stdev) for STATIC+EMP: {y_test2_median} +/- {y_test2_std}"
+)
 
 # --------------------------------------------------------------------------------------
+
+
+def add_reg_plot(ax, reg, stddev, color, center_reg):
+
+    x = numpy.array([-10, 1, 10])
+    if center_reg:
+        m = reg.coef_[0]
+        b = reg.intercept_
+        y = m * x + b
+        ax.plot(x, y, c=color)
+    else:
+        m = 1
+        b = 0
+        y = x.copy()
+    
+    # For specifying the distance between two parallel lines,
+    # I use this link and solve for b2:
+    # https://en.wikipedia.org/wiki/Distance_between_two_parallel_lines
+    # In this equation, d is my standard deviation.
+    # I also use 1*stdev because I want 1 deviations
+    b_pos = b + 1 * stddev * numpy.sqrt(m**2 + 1)
+    b_neg = b - 1 * stddev * numpy.sqrt(m**2 + 1)
+    # print(f"A: {m} {b}")
+    # print(f"b: {m} {b_pos}")
+    # print(f"{stddev}")
+    
+    ax.plot(x, x*m+b_pos, c=color, linestyle="dashed")
+    ax.plot(x, x*m+b_neg, c=color, linestyle="dashed")
+
 
 import matplotlib.pyplot as plt
 
@@ -358,8 +423,8 @@ ax1 = fig.add_subplot(
     gs[0, 0],
     xlabel="Barrier (eV) [static]",
     ylabel=r"Midpoint-only NEB Barrier (eV)",
-    xlim=(-1.5,5),
-    ylim=(-1.5,5.5),
+    xlim=(-1.5, 5),
+    ylim=(-1.5, 5),
 )
 hb = ax1.scatter(
     x=df["vaspcalca__energy_barrier"],  # X
@@ -367,11 +432,21 @@ hb = ax1.scatter(
     c="Green",  # COLOR
     alpha=0.4,  # Transparency
 )
+# hb = ax1.hexbin(
+#     x=df["vaspcalca__energy_barrier"],  # X
+#     y=df["vaspcalcb__energy_barrier"],  # Y
+#     gridsize=10,  # size of hex bins
+#     # cmap="RdYlGn_r",  # color scheme for colorbar
+#     vmin=0,
+#     # vmax=7.5,  # upper limit of colorbar
+#     edgecolor="black",  # color between hex bins
+# )
 line = ax1.plot(
-    [-1, 1, 3],  # X
-    [-1, 1, 3],  # Y
+    [-10, 1, 10],  # X
+    [-10, 1, 10],  # Y
     c="Black",  # COLOR
 )
+add_reg_plot(ax1, reg_static, std_error_static, "Green", True)
 
 # 2nd plot is the empirically-corrected vaspcalca
 ax2 = fig.add_subplot(
@@ -388,11 +463,11 @@ hb = ax2.scatter(
     alpha=0.4,  # Transparency
 )
 line = ax2.plot(
-    [-1, 1, 3],  # X
-    [-1, 1, 3],  # Y
+    [-10, 1, 10],  # X
+    [-10, 1, 10],  # Y
     c="Black",  # COLOR
 )
-
+add_reg_plot(ax2, reg_static_emp, y_test1_std, "Blue", False)
 
 # 3rd plot is the partial relaxation
 ax3 = fig.add_subplot(
@@ -409,10 +484,12 @@ hb = ax3.scatter(
     alpha=0.4,  # Transparency
 )
 line = ax3.plot(
-    [-1, 1, 3],  # X
-    [-1, 1, 3],  # Y
+    [-10, 1, 10],  # X
+    [-10, 1, 10],  # Y
     c="Black",  # COLOR
 )
+# add_stdev_lines(ax2, reg_relax)
+add_reg_plot(ax3, reg_relax, std_error_relax, "Red", True)
 
 
 # 4th plot is the empirically-corrected partial relaxation
@@ -430,12 +507,14 @@ hb = ax4.scatter(
     alpha=0.4,  # Transparency
 )
 line = ax4.plot(
-    [-1, 1, 3],  # X
-    [-1, 1, 3],  # Y
+    [-10, 1, 10],  # X
+    [-10, 1, 10],  # Y
     c="Black",  # COLOR
 )
+add_reg_plot(ax4, reg_relax_emp, y_test2_std, "Black", False)
 
-plt.show()
+# plt.show()
+plt.savefig("scatter.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
 
@@ -536,12 +615,13 @@ hb = ax4.hist(
 for ax in [ax1, ax2, ax3, ax4]:
     ax.axvline(0, color="black", linewidth=0.8, linestyle="--")
 
-plt.show()
+# plt.show()
+plt.savefig("hist.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
 
 
-# # TESTING
+# TESTING
 
 # from sklearn import linear_model
 # from sklearn.model_selection import train_test_split
@@ -558,10 +638,10 @@ plt.show()
 #     reg = linear_model.LinearRegression()
 #     # reg = linear_model.Lasso(alpha=0.1)
 #     # fit_intercept=False
-    
+
 #     # split our dataframe into training and test sets
 #     df_training, df_test = train_test_split(df, test_size=0.5)
-    
+
 #     # Fields to use in fitting
 #     fields_to_fit = [
 #         # "vaspcalca__energy_barrier",
@@ -572,11 +652,11 @@ plt.show()
 #         f"force_{convergence}",
 #         # "structure__e_above_hull",
 #         # "empiricalmeasures__ewald_energy",
-        
+
 #     ]
-    
+
 #     data = df_training[fields_to_fit + ["vaspcalcb__energy_barrier"]].dropna()
-    
+
 #     X_train = data[fields_to_fit]
 #     y_train = data["vaspcalcb__energy_barrier"]
 #     reg.fit(X_train, y_train)
@@ -591,16 +671,4 @@ plt.show()
 #     aa = [i[n] for i in coefs]
 #     %varexp --hist aa
 
-# Flat 0.7
-# Length -0.05
-# Forces -0.05
-# nsites^-3 -600
-
 # ----------------------------------------------------------------------------
-
-# TEST CODE, IGNORE
-# import pandas
-# test = pandas.DataFrame(
-#     {"neb": y_test1_expected.values, "static": y_test1_predicted},
-# )
-# test2 = test[(test["neb"] < 0.8) & (test["static"] > 1.0)]
