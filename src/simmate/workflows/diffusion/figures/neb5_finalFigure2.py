@@ -379,31 +379,34 @@ def add_reg_plot(ax, reg, stddev, color, center_reg):
         m = 1
         b = 0
         y = x.copy()
-    
+
     # For specifying the distance between two parallel lines,
     # I use this link and solve for b2:
     # https://en.wikipedia.org/wiki/Distance_between_two_parallel_lines
     # In this equation, d is my standard deviation.
     # I also use 1*stdev because I want 1 deviations
-    b_pos = b + 1 * stddev * numpy.sqrt(m**2 + 1)
-    b_neg = b - 1 * stddev * numpy.sqrt(m**2 + 1)
+    b_pos = b + 1 * stddev * numpy.sqrt(m ** 2 + 1)
+    b_neg = b - 1 * stddev * numpy.sqrt(m ** 2 + 1)
     # print(f"A: {m} {b}")
     # print(f"b: {m} {b_pos}")
     # print(f"{stddev}")
-    
-    ax.plot(x, x*m+b_pos, c=color, linestyle="dashed")
-    ax.plot(x, x*m+b_neg, c=color, linestyle="dashed")
+
+    ax.plot(x, x * m + b_pos, c=color, linestyle="dashed")
+    ax.plot(x, x * m + b_neg, c=color, linestyle="dashed")
+
+    # this is the black y=mx line
+    ax.plot(x, x, c="Black")
 
 
 import matplotlib.pyplot as plt
 
 # start with a square Figure
-fig = plt.figure(figsize=(24, 6))  # golden ratio = 1.618
+fig = plt.figure(figsize=(6, 6))  # golden ratio = 1.618
 
 gs = fig.add_gridspec(
     # grid dimensions and column/row relative sizes
-    nrows=1,
-    ncols=4,
+    nrows=2,
+    ncols=2,
     # width_ratios=(1, 1, 1),
     # height_ratios=(1, 1, 1),
     #
@@ -415,7 +418,7 @@ gs = fig.add_gridspec(
     #
     # spacing between subplots (axes)
     wspace=0.0,
-    hspace=0.05,
+    hspace=0.0,
 )
 
 # First plot is just the approximated barriers
@@ -426,6 +429,7 @@ ax1 = fig.add_subplot(
     xlim=(-1.5, 5),
     ylim=(-1.5, 5),
 )
+ax1.xaxis.set_ticks([-1,0,1,2,3,4,5])
 hb = ax1.scatter(
     x=df["vaspcalca__energy_barrier"],  # X
     y=df["vaspcalcb__energy_barrier"],  # Y
@@ -441,12 +445,8 @@ hb = ax1.scatter(
 #     # vmax=7.5,  # upper limit of colorbar
 #     edgecolor="black",  # color between hex bins
 # )
-line = ax1.plot(
-    [-10, 1, 10],  # X
-    [-10, 1, 10],  # Y
-    c="Black",  # COLOR
-)
 add_reg_plot(ax1, reg_static, std_error_static, "Green", True)
+
 
 # 2nd plot is the empirically-corrected vaspcalca
 ax2 = fig.add_subplot(
@@ -455,61 +455,46 @@ ax2 = fig.add_subplot(
     sharex=ax1,
     sharey=ax1,
 )
-plt.setp(ax2.get_yticklabels(), visible=False)
+plt.setp(ax2.get_yticklabels(), visible=True)
 hb = ax2.scatter(
     x=y_test1_predicted,  # X
     y=y_test1_expected,  # Y
     c="Blue",  # COLOR
     alpha=0.4,  # Transparency
 )
-line = ax2.plot(
-    [-10, 1, 10],  # X
-    [-10, 1, 10],  # Y
-    c="Black",  # COLOR
-)
 add_reg_plot(ax2, reg_static_emp, y_test1_std, "Blue", False)
+
 
 # 3rd plot is the partial relaxation
 ax3 = fig.add_subplot(
-    gs[0, 2],
+    gs[1, 0],
     xlabel=f"Barrier (eV) [NSW={max_nsw}; EDIFFG={convergence}]",
     sharex=ax1,
     sharey=ax1,
 )
-plt.setp(ax3.get_yticklabels(), visible=False)
+plt.setp(ax3.get_yticklabels(), visible=True)
 hb = ax3.scatter(
     x=df[f"barrier_{convergence}"],  # X
     y=df["vaspcalcb__energy_barrier"],  # Y
     c="Red",  # COLOR
     alpha=0.4,  # Transparency
 )
-line = ax3.plot(
-    [-10, 1, 10],  # X
-    [-10, 1, 10],  # Y
-    c="Black",  # COLOR
-)
-# add_stdev_lines(ax2, reg_relax)
 add_reg_plot(ax3, reg_relax, std_error_relax, "Red", True)
 
 
 # 4th plot is the empirically-corrected partial relaxation
 ax4 = fig.add_subplot(
-    gs[0, 3],
-    xlabel="Barrier (eV) [relax+ec]",
+    gs[1, 1],
+    xlabel="Approximated Barrier (eV) [relax+ec]",
     sharex=ax1,
     sharey=ax1,
 )
-plt.setp(ax4.get_yticklabels(), visible=False)
+plt.setp(ax4.get_yticklabels(), visible=True)
 hb = ax4.scatter(
     x=y_test2_predicted,  # X
     y=y_test2_expected,  # Y
     c="Black",  # COLOR
     alpha=0.4,  # Transparency
-)
-line = ax4.plot(
-    [-10, 1, 10],  # X
-    [-10, 1, 10],  # Y
-    c="Black",  # COLOR
 )
 add_reg_plot(ax4, reg_relax_emp, y_test2_std, "Black", False)
 

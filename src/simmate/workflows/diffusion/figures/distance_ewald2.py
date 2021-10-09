@@ -52,29 +52,29 @@ df["test"] = df["empiricalmeasuresb__ewald_energyb"] * ((numpy.exp(df["empirical
 # --------------------------------------------------------------------------------------
 
 # The code below is for interactive plotting using Plotly
-import plotly.express as px
+# import plotly.express as px
 
-fig = px.scatter(
-    data_frame=df,
-    x="empiricalmeasuresb__ewald_energyb",
-    y="vaspcalca__energy_barrier",
-    # color="vaspcalca__energy_barrier",
-    # range_color=[0, 1.1],
-    # log_x=True,
-    # log_y=True,
-    hover_data=[
-        "id",
-        "length",
-        "structure__id",
-        "structure__formula_full",
-        "structure__spacegroup",
-        "structure__formula_anonymous",
-        "structure__e_above_hull",
-        "empiricalmeasuresb__ewald_energya",
-        "vaspcalca__energy_barrier",
-    ],
-)
-fig.show(renderer="browser", config={"scrollZoom": True})
+# fig = px.scatter(
+#     data_frame=df,
+#     x="empiricalmeasuresb__ewald_energyb",
+#     y="vaspcalca__energy_barrier",
+#     # color="vaspcalca__energy_barrier",
+#     # range_color=[0, 1.1],
+#     # log_x=True,
+#     # log_y=True,
+#     hover_data=[
+#         "id",
+#         "length",
+#         "structure__id",
+#         "structure__formula_full",
+#         "structure__spacegroup",
+#         "structure__formula_anonymous",
+#         "structure__e_above_hull",
+#         "empiricalmeasuresb__ewald_energya",
+#         "vaspcalca__energy_barrier",
+#     ],
+# )
+# fig.show(renderer="browser", config={"scrollZoom": True})
 # fig.write_html("delta_ewald_normalized.html")
 
 # --------------------------------------------------------------------------------------
@@ -116,15 +116,17 @@ ax = fig.add_subplot(
 # ax.axhline(0, color="black", linewidth=0.8, linestyle="--")
 # ax.axvline(0, color="black", linewidth=0.8, linestyle="--")
 # create the hexbin subplot
+ax.set(xlim=(2.15, 5.1), ylim=(-10, 20))
 hb = ax.hexbin(
     x=df["length"],  # X
     y=df["empiricalmeasuresb__ewald_energyb"],  # Y
     C=df["vaspcalca__energy_barrier"],  # COLOR
-    gridsize=20,  # size of hex bins
+    gridsize=[25,24],  # size of hex bins
     cmap="RdYlGn_r",  # color scheme for colorbar
     vmin=0,
     vmax=7.5,  # upper limit of colorbar
     edgecolor="black",  # color between hex bins
+    # mincnt=1,
 )
 # add the colorbar (for positioning we give it its own axes)
 # where arg is [left, bottom, width, height]
@@ -162,7 +164,7 @@ ax_histy = fig.add_subplot(
 ax_histy.hist(
     x=df["empiricalmeasuresb__ewald_energyb"],
     orientation="horizontal",
-    bins=75,
+    bins=150,
     color="black",
     edgecolor="white",
     linewidth=0.5,
@@ -174,7 +176,8 @@ ax_histy.hist(
 ax_histx.tick_params(axis="x", labelbottom=False)
 ax_histy.tick_params(axis="y", labelleft=False)
 
-plt.show()
+# plt.show()
+plt.savefig("ewald_and_length.svg", format="svg")
 
 
 # --------------------------------------------------------------------------------------
