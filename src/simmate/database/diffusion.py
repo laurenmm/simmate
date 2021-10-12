@@ -527,11 +527,11 @@ class Prototype3(models.Model):
 
 
 # This my custom matching
-# class MatProjData(models.Model):
-#     band_gap = models.FloatField(blank=True, null=True)
-#     cost_per_mol = models.FloatField(blank=True, null=True)
-#     cost_per_kg = models.FloatField(blank=True, null=True)
-#     structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
+class MatProjData(models.Model):
+    band_gap = models.FloatField(blank=True, null=True)
+    cost_per_mol = models.FloatField(blank=True, null=True)
+    cost_per_kg = models.FloatField(blank=True, null=True)
+    structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
 
-#     class Meta:
-#         app_label = "diffusion"
+    class Meta:
+        app_label = "diffusion"
