@@ -179,9 +179,10 @@ from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
 # 51, 1686, 29326
 # GOOD NEB: 77
 # BAD NEB: 1046
-pathway_id = 103
+# Y-S-F 1052 9924
+pathway_id = 9924
 path = Pathway_DB.objects.get(id=pathway_id)
-get_oxi_supercell_path(path.to_pymatgen(), 7).write_path(
+get_oxi_supercell_path(path.to_pymatgen(), 10).write_path(
     f"{pathway_id}.cif",
     nimages=5,
     # idpp=True,
@@ -199,7 +200,7 @@ get_oxi_supercell_path(path.to_pymatgen(), 7).write_path(
 # structure_end = Structure.from_dict(structure_dict)
 # structure_end.to("cif", "z2.cif")
 
-# linear path from start to end
+# # linear path from start to end
 # images = structure_start.interpolate(structure_end, interpolate_lattices=True)
 # test = [image.to(filename=f"{n}.cif") for n, image in enumerate(images)]
 
