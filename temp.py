@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
 
+# from simmate.shortcuts import setup
+# from simmate.database.diffusion import Prototype3
+# from django_pandas.io import read_frame
+
+# from tqdm import tqdm
+# total = 0
+# for group_id in tqdm(range(5000)):
+#     count = Prototype3.objects.filter(number=group_id).count()
+#     if count == 1:
+#         total += 1
+
+
 # --------------------------------------------------------------------------------------
 
 from prefect import Client
@@ -180,7 +192,8 @@ from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
 # GOOD NEB: 77
 # BAD NEB: 1046
 # Y-S-F 1052 9924
-pathway_id = 9924
+# InF3 2229
+pathway_id = 2229
 path = Pathway_DB.objects.get(id=pathway_id)
 get_oxi_supercell_path(path.to_pymatgen(), 10).write_path(
     f"{pathway_id}.cif",
@@ -188,22 +201,58 @@ get_oxi_supercell_path(path.to_pymatgen(), 10).write_path(
     # idpp=True,
 )
 
-# import json
-# from pymatgen.core.structure import Structure
-# structure_dict = json.loads(path.vaspcalcb.structure_start_json)
-# structure_start = Structure.from_dict(structure_dict)
-# structure_start.to("cif", "z0.cif")
-# structure_dict = json.loads(path.vaspcalcb.structure_midpoint_json)
-# structure_midpoint = Structure.from_dict(structure_dict)
-# structure_midpoint.to("cif", "z1.cif")
-# structure_dict = json.loads(path.vaspcalcb.structure_end_json)
-# structure_end = Structure.from_dict(structure_dict)
-# structure_end.to("cif", "z2.cif")
+import json
+from pymatgen.core.structure import Structure
+structure_dict = json.loads(path.vaspcalcb.structure_start_json)
+structure_start = Structure.from_dict(structure_dict)
+structure_start.to("cif", "z0.cif")
+structure_dict = json.loads(path.vaspcalcb.structure_midpoint_json)
+structure_midpoint = Structure.from_dict(structure_dict)
+structure_midpoint.to("cif", "z1.cif")
+structure_dict = json.loads(path.vaspcalcb.structure_end_json)
+structure_end = Structure.from_dict(structure_dict)
+structure_end.to("cif", "z2.cif")
 
-# # linear path from start to end
-# images = structure_start.interpolate(structure_end, interpolate_lattices=True)
-# test = [image.to(filename=f"{n}.cif") for n, image in enumerate(images)]
+# linear path from start to end
+images = structure_start.interpolate(structure_end, nimages=5, interpolate_lattices=True)
+test = [image.to(filename=f"{n}.cif") for n, image in enumerate(images)]
 
+def sum_structures(structures):
+    
+    import numpy
+    from pymatgen.core.structure import Structure
+    
+    final_coords = []
+    final_species = []
+    for structure in structures:
+        for site in structure:
+            is_new = True
+            for coords in final_coords:
+                if all(
+                    numpy.isclose(
+                        site.frac_coords,
+                        coords,
+                        rtol=1e-03,
+                        atol=1e-03,
+                    )
+                ):
+                    is_new = False
+                    break
+            if is_new:
+                final_coords.append(site.frac_coords)
+                final_species.append(site.specie)
+    
+    structure = Structure(
+        lattice = structure.lattice,
+        species = final_species,
+        coords = final_coords,
+        )
+    
+    structure.to("cif", "sum_struct.cif")
+    
+    return structure
+
+s = sum_structures(images)
 
 # from simmate.database.diffusion import Pathway as Pathway_DB
 # path_db = Pathway_DB.objects.get(id=55).to_pymatgen().write_path("test.cif", nimages=3)
