@@ -193,9 +193,9 @@ from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
 # BAD NEB: 1046
 # Y-S-F 1052 9924
 # InF3 2229
-pathway_id = 2229
+pathway_id = 78
 path = Pathway_DB.objects.get(id=pathway_id)
-get_oxi_supercell_path(path.to_pymatgen(), 10).write_path(
+get_oxi_supercell_path(path.to_pymatgen(), 8).write_path(
     f"{pathway_id}.cif",
     nimages=5,
     # idpp=True,
@@ -213,9 +213,20 @@ structure_dict = json.loads(path.vaspcalcb.structure_end_json)
 structure_end = Structure.from_dict(structure_dict)
 structure_end.to("cif", "z2.cif")
 
+structure_end.sort()
+structure_start.sort()
+structure_midpoint.sort()
+
 # linear path from start to end
-images = structure_start.interpolate(structure_end, nimages=5, interpolate_lattices=True)
+images1 = structure_start.interpolate(
+    structure_midpoint, nimages=3, interpolate_lattices=True
+)
+images2 = structure_midpoint.interpolate(
+    structure_end, nimages=3, interpolate_lattices=True
+)
+images = images1[:-1] + images2
 test = [image.to(filename=f"{n}.cif") for n, image in enumerate(images)]
+
 
 def sum_structures(structures):
     
