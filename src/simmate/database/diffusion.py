@@ -535,3 +535,11 @@ class MatProjData(models.Model):
 
     class Meta:
         app_label = "diffusion"
+
+
+class EmpCorBarrier(models.Model):
+    barrier = models.FloatField(blank=True, null=True)
+    pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "diffusion"

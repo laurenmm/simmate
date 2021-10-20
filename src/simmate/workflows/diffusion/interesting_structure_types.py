@@ -15,43 +15,43 @@ from django_pandas.io import read_frame
 # mp-34291
 # mp-1208602
 # mp-27315
-queryset = (
-    Pathway_DB.objects.filter(
-        structure__id="mp-27315",
-        # structure__chemical_system="F-Mg-Ti", # Bi-F-O
-        # structure__formula_reduced="LaF3", # BiOF
-        # vaspcalca__energy_barrier__isnull=False,
-        # structure__nelement__lte=4,
-        # structure__chemical_system__contains="Pb",
-        # structure__e_above_hull=0,
-    )
-    .order_by("structure__id", "vaspcalca__energy_barrier")
-    # BUG: distinct() doesn't work for sqlite, only postgres. also you must have
-    # "structure__id" as the first flag in order_by for this to work.
-    .select_related("vaspcalca", "empiricalmeasures", "structure")
-    # .distinct("structure__id")
-    .all()
-)
-
-# ELECTROLYTES
 # queryset = (
 #     Pathway_DB.objects.filter(
-#         structure__e_above_hull=0,
-#         structure__matprojdata__band_gap__gte=3.5,
-#         vaspcalca__energy_barrier__lte=1,
-#         vaspcalca__energy_barrier__gte=0,
-#         # vaspcalcb__isnull=True,
-#         structure__matprojdata__cost_per_kg__lte=125,
-#         structure__matprojdata__cost_per_mol__lte=125,
-#         empiricalmeasures__dimensionality_cumlengths=3,
+#         structure__id="mp-27315",
+#         # structure__chemical_system="F-Mg-Ti", # Bi-F-O
+#         # structure__formula_reduced="LaF3", # BiOF
+#         # vaspcalca__energy_barrier__isnull=False,
+#         # structure__nelement__lte=4,
+#         # structure__chemical_system__contains="Pb",
+#         # structure__e_above_hull=0,
 #     )
-#     .order_by("structure__formula_reduced", "vaspcalca__energy_barrier")
+#     .order_by("structure__id", "vaspcalca__energy_barrier")
 #     # BUG: distinct() doesn't work for sqlite, only postgres. also you must have
 #     # "structure__id" as the first flag in order_by for this to work.
-#     .select_related("vaspcalca", "empiricalmeasures", "structure")
-#     .distinct("structure__formula_reduced")
+#     .select_related("vaspcalca", "empiricalmeasures", "structure", "empcorbarrier")
+#     # .distinct("structure__id")
 #     .all()
 # )
+
+# ELECTROLYTES
+queryset = (
+    Pathway_DB.objects.filter(
+        structure__e_above_hull=0,
+        structure__matprojdata__band_gap__gte=3.5,
+        vaspcalca__energy_barrier__lte=1,
+        vaspcalca__energy_barrier__gte=0,
+        # vaspcalcb__isnull=True,
+        structure__matprojdata__cost_per_kg__lte=125,
+        structure__matprojdata__cost_per_mol__lte=125,
+        empiricalmeasures__dimensionality_cumlengths=3,
+    )
+    .order_by("structure__formula_reduced", "vaspcalca__energy_barrier")
+    # BUG: distinct() doesn't work for sqlite, only postgres. also you must have
+    # "structure__id" as the first flag in order_by for this to work.
+    .select_related("vaspcalca", "empiricalmeasures", "structure", "empcorbarrier")
+    .distinct("structure__formula_reduced")
+    .all()
+)
 
 # ELECTRODES
 # queryset = (
@@ -68,7 +68,7 @@ queryset = (
 #     .order_by("structure__formula_reduced", "vaspcalca__energy_barrier")
 #     # BUG: distinct() doesn't work for sqlite, only postgres. also you must have
 #     # "structure__id" as the first flag in order_by for this to work.
-#     .select_related("vaspcalca", "empiricalmeasures", "structure")
+#     .select_related("vaspcalca", "empiricalmeasures", "structure", "empcorbarrier")
 #     .distinct("structure__formula_reduced")
 #     .all()
 # )
@@ -92,6 +92,7 @@ df = read_frame(
         "structure__prototype2__formula_reduced",
         "structure__prototype3__number",
         "vaspcalca__energy_barrier",
+        "empcorbarrier__barrier",
         "vaspcalcb__energy_barrier",
         "empiricalmeasures__dimensionality",
         "empiricalmeasures__dimensionality_cumlengths",

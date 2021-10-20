@@ -12,7 +12,7 @@ queryset = (
         vaspcalca__energy_barrier__gte=0,
         empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
     )
-    .select_related("vaspcalca", "empiricalmeasures")
+    .select_related("vaspcalca", "empiricalmeasures", "empcorbarrier")
     .all()
 )
 from django_pandas.io import read_frame
@@ -25,6 +25,7 @@ df = read_frame(
         "empiricalmeasures__ionic_radii_overlap_anions",
         "empiricalmeasures__ionic_radii_overlap_cations",
         "vaspcalca__energy_barrier",
+        "empcorbarrier__barrier",
     ],
 )
 
@@ -85,10 +86,10 @@ ax.axvline(0, color="black", linewidth=0.8, linestyle="--")
 hb = ax.hexbin(
     x=df["empiricalmeasures__ionic_radii_overlap_anions"],  # X
     y=df["empiricalmeasures__ionic_radii_overlap_cations"],  # Y
-    C=df["vaspcalca__energy_barrier"],  # COLOR
+    C=df["empcorbarrier__barrier"],  # COLOR
     gridsize=20,  # size of hex bins
     cmap="RdYlGn_r",  # color scheme for colorbar
-    vmax=7.5,  # upper limit of colorbar
+    vmax=4,  # upper limit of colorbar
     edgecolor="black",  # color between hex bins
 )
 # add the colorbar (for positioning we give it its own axes)
@@ -138,7 +139,7 @@ ax_histy.axhline(0, color="black", linewidth=0.8, linestyle="--")
 ax_histx.tick_params(axis="x", labelbottom=False)
 ax_histy.tick_params(axis="y", labelleft=False)
 
-# plt.show()
-plt.savefig("iro.svg", format="svg")
+plt.show()
+# plt.savefig("iro.svg", format="svg")
 
 # --------------------------------------------------------------------------------------

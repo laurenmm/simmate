@@ -11,7 +11,7 @@ queryset = (
         empiricalmeasuresb__isnull=False,
         structure__e_above_hull__lte=0.05,
     )
-    .select_related("vaspcalca", "empiricalmeasuresb", "structure")
+    .select_related("vaspcalca", "empiricalmeasuresb", "structure", "empcorbarrier")
     .all()
 )
 from django_pandas.io import read_frame
@@ -22,6 +22,7 @@ df = read_frame(
         "length",
         "empiricalmeasuresb__ewald_energyb",
         "vaspcalca__energy_barrier",
+        "empcorbarrier__barrier",
     ],
 )
 
@@ -96,11 +97,11 @@ ax.set(xlim=(2.15, 5.1), ylim=(-10, 20))
 hb = ax.hexbin(
     x=df["length"],  # X
     y=df["empiricalmeasuresb__ewald_energyb"],  # Y
-    C=df["vaspcalca__energy_barrier"],  # COLOR
+    C=df["empcorbarrier__barrier"],  # COLOR
     gridsize=[22,25],  # size of hex bins
     cmap="RdYlGn_r",  # color scheme for colorbar
     vmin=0,
-    vmax=7.5,  # upper limit of colorbar
+    vmax=4,  # upper limit of colorbar
     edgecolor="black",  # color between hex bins
     # mincnt=1,
 )

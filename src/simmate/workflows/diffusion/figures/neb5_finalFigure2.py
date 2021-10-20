@@ -296,7 +296,7 @@ reg_static_emp = linear_model.LinearRegression()
 # Fields to use in fitting
 fields_to_fit = [
     "vaspcalca__energy_barrier",
-    "nsites_777_^-3",
+    # "nsites_777_^-3",
 ]
 
 data = df[fields_to_fit + ["vaspcalcb__energy_barrier"]].dropna()
@@ -339,7 +339,7 @@ reg_relax_emp = linear_model.LinearRegression()
 fields_to_fit = [
     f"barrier_{convergence}",
     f"force_{convergence}",
-    "nsites_777_^-3",
+    # "nsites_777_^-3",
 ]
 
 data = df[fields_to_fit + ["vaspcalcb__energy_barrier"]].dropna()
@@ -361,7 +361,7 @@ y_test2_errors = y_test2_predicted - y_test2_expected
 y_test2_std = numpy.std(y_test2_errors)
 y_test2_median = numpy.median(y_test2_errors)
 print(
-    f"The error (median +/- stdev) for STATIC+EMP: {y_test2_median} +/- {y_test2_std}"
+    f"The error (median +/- stdev) for RELAX+EMP: {y_test2_median} +/- {y_test2_std}"
 )
 
 # --------------------------------------------------------------------------------------
@@ -631,7 +631,7 @@ plt.savefig("hist.svg", format="svg")
 #     fields_to_fit = [
 #         # "vaspcalca__energy_barrier",
 #         f"barrier_{convergence}",
-#         "nsites_777_^-3",
+#         # "nsites_777_^-3",
 #         # "length",
 #         # "nsites_777",
 #         f"force_{convergence}",
@@ -657,3 +657,17 @@ plt.savefig("hist.svg", format="svg")
 #     %varexp --hist aa
 
 # ----------------------------------------------------------------------------
+
+# MOST RECENT FIT:
+# The error (median +/- stdev) for STATIC: 0.16537820499999611 +/- 0.4272277579206024
+# The error (median +/- stdev) for RELAX: 0.09188301000000365 +/- 0.33038031703038356
+# [0.5490255163290795, 0.11855154528995404]
+# 0.7178176279782049
+# [0.7491283065988488, 0.04113666727532683]
+# 0.6388885077920168
+# [0.5490255163290795, 0.11855154528995404]
+# 0.7178176279782049
+# The error (median +/- stdev) for STATIC+EMP: -0.009634890926245587 +/- 0.31827451066676077
+# [0.8566552885935623, -0.15232905154653764, 0.03324373596524466]
+# 0.6757090693730672
+# The error (median +/- stdev) for STATIC+EMP: -0.009765134714721846 +/- 0.28599423562696025
