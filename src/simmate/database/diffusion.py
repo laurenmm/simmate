@@ -543,3 +543,11 @@ class EmpCorBarrier(models.Model):
 
     class Meta:
         app_label = "diffusion"
+
+
+class HostLattice(models.Model):
+    dimension = models.IntegerField(blank=True, null=True)
+    structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "diffusion"

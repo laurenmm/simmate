@@ -153,8 +153,8 @@ ax_histy.hist(
 ax_histx.tick_params(axis="x", labelbottom=False)
 ax_histy.tick_params(axis="y", labelleft=False)
 
-plt.show()
-# plt.savefig("ewald_and_length.svg", format="svg")
+# plt.show()
+plt.savefig("ewald_and_length.svg", format="svg")
 
 
 # --------------------------------------------------------------------------------------

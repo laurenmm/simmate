@@ -139,7 +139,7 @@ ax_histy.axhline(0, color="black", linewidth=0.8, linestyle="--")
 ax_histx.tick_params(axis="x", labelbottom=False)
 ax_histy.tick_params(axis="y", labelleft=False)
 
-plt.show()
-# plt.savefig("iro.svg", format="svg")
+# plt.show()
+plt.savefig("iro.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
