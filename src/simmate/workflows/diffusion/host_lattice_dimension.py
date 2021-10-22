@@ -33,11 +33,11 @@ def get_host_dimension(structure):
 @task
 def save_to_db(structure_id, dim):
 
-    p = HostLattice(
+    h = HostLattice(
         structure_id=structure_id,
         dimension=dim,
     )
-    p.save()
+    h.save()
 
 
 with Flow("PrototypeMatcher") as workflow:
@@ -49,19 +49,19 @@ with Flow("PrototypeMatcher") as workflow:
 
 # ----------------------------------------------------------------------------
 
-from tqdm import tqdm
-from dask.distributed import Client
+# from tqdm import tqdm
+# from dask.distributed import Client
 
 
-client = Client(preload="simmate.configuration.dask.init_django_worker")
-structure_ids = (
-    MPStructure.objects.filter(hostlattice__isnull=True)
-    .values_list("id", flat=True)
-    .all()
-)
+# client = Client(preload="simmate.configuration.dask.init_django_worker")
+# structure_ids = (
+#     MPStructure.objects.filter(hostlattice__isnull=True)
+#     .values_list("id", flat=True)
+#     .count()
+# )
 
-client.map(
-    workflow.run,
-    [{"structure_id": id} for id in structure_ids],
-    pure=False,
-)
+# client.map(
+#     workflow.run,
+#     [{"structure_id": id} for id in structure_ids],
+#     pure=False,
+# )

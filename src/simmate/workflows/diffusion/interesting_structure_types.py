@@ -6,46 +6,22 @@ from django_pandas.io import read_frame
 
 # STRUCTURE TYPES
 # (group_number, count)
-# (22, 23) -- 3D
-# (42, 10) -- 2D --
-# (48, 6) -- 2D --
-# (53, 4) -- 3D
-# (707, 8) -- 3D
-# (1027, 4) -- 2D --
-# (1336, 17) -- 3D
-# (1389, 5) -- 3D
-# (1457, 5) -- 3D
-# (1739, 4) -- 3D
-# (1766, 4) -- 3D
-# (2086, 4) -- 
-
-# (22, 56) -- 3D
-# (42, 10) -- 2D --
-# (48, 6) -- 2D --
-# (53, 13) -- 3D
-# (177, 4) -- 3D
-# (707, 8) -- 3D
-# (726, 7) -- 3D
-# (1010, 6) -- 3D
-# (1027, 4) -- 2D --
-# (1099, 11) -- 3D
-# (1248, 4) -- 3D
-# (1336, 24) -- 3D
-# (1389, 10) -- 3D
-# (1457, 9) -- 3D
-# (1739, 4) -- 3D
-# (1766, 4) -- 3D
-# (2086, 4) -- 3D
+# (17, 3)
+# (42, 10)
+# (48, 6)
+# (1017, 3) -- Not interc
+# (1027, 4)
+# (2727, 3) -- molecular SF bonds?
 
 queryset = (
     Pathway_DB.objects.filter(
         # structure__prototype2__formula_reduced__isnull=False,
-        structure__prototype2__formula_reduced="FeClO",
+        # structure__prototype2__formula_reduced="FeClO",
         # vaspcalca__energy_barrier__gte=-1,
         # vaspcalca__energy_barrier__lte=1,
         empcorbarrier__barrier__gte=-1,
         empcorbarrier__barrier__lte=1,
-        # structure__prototype3__number=803,
+        structure__prototype3__number=2727,
     )
     .order_by(
         "structure__id",
@@ -173,29 +149,30 @@ df = read_frame(
 
 
 # Find which groups have at least 4 structures with <1eV pathways
-from tqdm import tqdm
-final_groups = []
-for group_num in tqdm(range(4936)):  # 4936
-    count = (
-        Pathway_DB.objects.filter(
-            # vaspcalca__energy_barrier__gte=-1,
-            # vaspcalca__energy_barrier__lte=1,
-            structure__e_above_hull=0,
-            empcorbarrier__barrier__gte=-1,
-            empcorbarrier__barrier__lte=1,
-            structure__prototype3__number=group_num,
-            # empiricalmeasures__dimensionality_cumlengths=2,
-        )
-        .order_by(
-            "structure__id",
-            # "vaspcalca__energy_barrier",
-            "empcorbarrier__barrier",
-        )
-        .distinct("structure__id")
-        .count()
-    )
-    if count >= 3:
-        final_groups.append((group_num, count))
+# from tqdm import tqdm
+# final_groups = []
+# for group_num in tqdm(range(4936)):  # 4936
+#     count = (
+#         Pathway_DB.objects.filter(
+#             # vaspcalca__energy_barrier__gte=-1,
+#             # vaspcalca__energy_barrier__lte=1,
+#             structure__e_above_hull=0,
+#             empcorbarrier__barrier__gte=-1,
+#             empcorbarrier__barrier__lte=1,
+#             structure__prototype3__number=group_num,
+#             structure__hostlattice__dimension=2,
+#             # empiricalmeasures__dimensionality_cumlengths=2,
+#         )
+#         .order_by(
+#             "structure__id",
+#             # "vaspcalca__energy_barrier",
+#             "empcorbarrier__barrier",
+#         )
+#         .distinct("structure__id")
+#         .count()
+#     )
+#     if count >= 3:
+#         final_groups.append((group_num, count))
 
 # from simmate.workflows.diffusion.vaspcalc_b import workflow
 # result = workflow.run(pathway_id=3216, vasp_cmd="mpirun -n 28 vasp")
