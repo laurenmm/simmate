@@ -5,23 +5,15 @@ from simmate.database.diffusion import Pathway as Pathway_DB
 from django_pandas.io import read_frame
 
 # STRUCTURE TYPES
-# (group_number, count)
-# (17, 3)
-# (42, 10)
-# (48, 6)
-# (1017, 3) -- Not interc
-# (1027, 4)
-# (2727, 3) -- molecular SF bonds?
 
 queryset = (
     Pathway_DB.objects.filter(
-        # structure__prototype2__formula_reduced__isnull=False,
-        # structure__prototype2__formula_reduced="FeClO",
-        # vaspcalca__energy_barrier__gte=-1,
-        # vaspcalca__energy_barrier__lte=1,
+        structure__prototype2__formula_reduced__isnull=False,
         empcorbarrier__barrier__gte=-1,
         empcorbarrier__barrier__lte=1,
-        structure__prototype3__number=2727,
+        structure__e_above_hull=0,
+        structure__hostlattice__dimension=2,
+        empiricalmeasures__dimensionality_cumlengths=2,
     )
     .order_by(
         "structure__id",
@@ -31,6 +23,45 @@ queryset = (
     .distinct("structure__id")
     .all()
 )
+
+# (group_number, count)
+# 2D host lattice, 2D cumlengths path
+# (17, 3) --
+# (42, 10) --
+# (48, 6) --
+# (68, 1)
+# (117, 1)
+# (257, 2)
+# (388, 1)
+# (1027, 4) --
+# (1097, 1)
+# (1336, 2)
+# (1799, 1)
+# (1816, 1)
+# (2074, 1)
+# (2082, 2)
+# (2229, 2)
+# (2277, 2)
+# (2628, 1)
+# (2727, 3) -- molecular SF bonds?
+# queryset = (
+#     Pathway_DB.objects.filter(
+#         # structure__prototype2__formula_reduced__isnull=False,
+#         # structure__prototype2__formula_reduced="FeClO",  # AgLaOS, PbClF
+#         # vaspcalca__energy_barrier__gte=-1,
+#         # vaspcalca__energy_barrier__lte=1,
+#         empcorbarrier__barrier__gte=-1,
+#         empcorbarrier__barrier__lte=1,
+#         structure__prototype3__number=177,
+#     )
+#     .order_by(
+#         "structure__id",
+#         "vaspcalca__energy_barrier",
+#     )
+#     .select_related("vaspcalca", "empiricalmeasures", "structure")
+#     .distinct("structure__id")
+#     .all()
+# )
 
 # SEARCHING BY COMPOSITION
 # mp-315
@@ -161,7 +192,7 @@ df = read_frame(
 #             empcorbarrier__barrier__lte=1,
 #             structure__prototype3__number=group_num,
 #             structure__hostlattice__dimension=2,
-#             # empiricalmeasures__dimensionality_cumlengths=2,
+#             empiricalmeasures__dimensionality_cumlengths=2,
 #         )
 #         .order_by(
 #             "structure__id",
@@ -171,7 +202,7 @@ df = read_frame(
 #         .distinct("structure__id")
 #         .count()
 #     )
-#     if count >= 3:
+#     if count >= 1:
 #         final_groups.append((group_num, count))
 
 # from simmate.workflows.diffusion.vaspcalc_b import workflow
