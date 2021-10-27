@@ -110,7 +110,7 @@ from django_pandas.io import read_frame
 # mp-6949
 # mp-588
 # mvc-14678
-# mp-1539332
+    # mp-1539332
 # mp-3881
 # mp-8291
 # mp-34291
@@ -187,24 +187,24 @@ queryset = (
 # FOR STRUCTURE-TYPE PLOT BELOW
 # PbClF*, LaAgSO*, Ce2SO2
 # [17*, 42*, 48*, 388, 1027*, 1799, 2628]
-# queryset = (
-#     Pathway_DB.objects.filter(
-#         # structure__prototype2__formula_reduced="LaAgSO",
-#         structure__prototype3__number=17,
-#         # structure__e_above_hull=0,
-#         empcorbarrier__barrier__gte=0,
-#         empcorbarrier__barrier__lte=1,
-#         structure__hostlattice__dimension=2,
-#         empiricalmeasures__dimensionality_cumlengths=2,
-#     )
-#     .order_by(
-#         "structure__id",
-#         "vaspcalca__energy_barrier",
-#     )
-#     .select_related("vaspcalca", "empiricalmeasures", "structure")
-#     .distinct("structure__id")
-#     .all()
-# )
+queryset = (
+    Pathway_DB.objects.filter(
+        # structure__prototype2__formula_reduced="PbClF",
+        structure__prototype3__number=42,
+        # structure__e_above_hull=0,
+        empcorbarrier__barrier__gte=0,
+        empcorbarrier__barrier__lte=1,
+        structure__hostlattice__dimension=2,
+        empiricalmeasures__dimensionality_cumlengths=2,
+    )
+    .order_by(
+        "structure__id",
+        "vaspcalca__energy_barrier",
+    )
+    .select_related("vaspcalca", "empiricalmeasures", "structure")
+    .distinct("structure__id")
+    .all()
+)
 
 # ----------------------------------------------------------------------------
 

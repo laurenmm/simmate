@@ -1,67 +1,27 @@
 # -*- coding: utf-8 -*-
 
-from pymatgen.analysis.local_env import CrystalNN
-from pymatgen.analysis.dimensionality import get_dimensionality_larsen
-
-from prefect import Flow, Parameter, task
+from tqdm import tqdm
 from simmate.configuration.django import setup_full  # ensures setup
-from simmate.database.diffusion import (
-    MaterialsProjectStructure as MPStructure,
-    HostLattice
+from simmate.database.diffusion import Pathway as Pathway_DB, EmpCorBarrier
+
+queryset = (
+    Pathway_DB.objects.filter(
+        vaspcalca__energy_barrier__isnull=False,
+    )
+    .all()
 )
 
 
-@task
-def load_structure_from_db(structure_id):
-    structure_db = MPStructure.objects.get(id=structure_id)
-    structure = structure_db.to_pymatgen()
-    return structure
-
-
-@task
-def get_host_dimension(structure):
+orig=[]
+new=[]
+for pathway in tqdm(queryset):
     
-    structure.remove_species("F")
+    energy = pathway.vaspcalca.energy_barrier
     
-    bonded_structure = CrystalNN().get_bonded_structure(structure)
-
-    dimensionality = get_dimensionality_larsen(bonded_structure)
-
-    return dimensionality
-
-
-@task
-def save_to_db(structure_id, dim):
-
-    h = HostLattice(
-        structure_id=structure_id,
-        dimension=dim,
-    )
-    h.save()
-
-
-with Flow("PrototypeMatcher") as workflow:
-    structure_id = Parameter("structure_id")
-    structure = load_structure_from_db(structure_id)
-    dim = get_host_dimension(structure)
-    save_to_db(structure_id, dim)
-
-
-# ----------------------------------------------------------------------------
-
-# from tqdm import tqdm
-# from dask.distributed import Client
-
-
-# client = Client(preload="simmate.configuration.dask.init_django_worker")
-# structure_ids = (
-#     MPStructure.objects.filter(hostlattice__isnull=True)
-#     .values_list("id", flat=True)
-#     .count()
-# )
-
-# client.map(
-#     workflow.run,
-#     [{"structure_id": id} for id in structure_ids],
-#     pure=False,
-# )
+    corrected_energy = energy * 0.549 + 0.119
+    
+    orig.append(energy)
+    new.append(corrected_energy)
+    
+    ecb = EmpCorBarrier(barrier=corrected_energy, pathway=pathway)
+    ecb.save()
