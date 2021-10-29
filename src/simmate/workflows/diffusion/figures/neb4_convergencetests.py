@@ -267,7 +267,7 @@ times_relax_std = []
 times_relax_mean = []
 ####
 
-convergence_list = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005]
+convergence_list = [0.1, 0.05, 0.01, 0.005, 0.0025, 0.001, 0.0005]
 
 for convergence in convergence_list:
     energies = []
@@ -631,22 +631,27 @@ ax1.tick_params(axis="x", labelbottom=False)
 import matplotlib.pyplot as plt
 
 # start with a square Figure
-fig = plt.figure(figsize=(6, 6))  # golden ratio = 1.618
+fig = plt.figure(figsize=(4* 1.618, 4))  # golden ratio = 1.618
 
 # Add axes for the main plot
 ax = fig.add_subplot(
-    xlabel="CPU Time (hrs)",
-    ylabel="Error (eV)",
-    # xlim=(0, 6),
+    xlabel="Average CPU Time (rel. to static)",
+    ylabel="Median Error (meV)",
+    # xlim=(0, 9),
     # ylim=(0, 0.5),
 )
 
 # add the data
 hb = ax.errorbar(
-    x=times_relax_median,
-    y=errors_relax_median,
+    x=numpy.array(times_relax_mean) / times_relax_mean[0],
+    y=numpy.array(errors_relax_median) * 1000,
     # xerr=times_relax_std,
-    yerr=errors_relax_std,
+    yerr=numpy.array(errors_relax_std) * 1000,
     fmt='--o',
     capsize=6,
+    color="green",
 )
+
+ax.axhline(0, color="black", linewidth=0.8, linestyle="--")
+
+plt.savefig("error_analysis.svg", format="svg")

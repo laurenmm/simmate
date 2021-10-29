@@ -9,10 +9,12 @@ from simmate.database.diffusion import Pathway as Pathway_DB
 queryset = (
     Pathway_DB.objects.filter(
         vaspcalca__energy_barrier__isnull=False,
-        vaspcalca__energy_barrier__gte=0,
+        # vaspcalca__energy_barrier__gte=0,
         # empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
     )
-    .select_related("vaspcalca", "empiricalmeasures", "empcorbarrier")
+    .select_related(
+        "vaspcalca", "empiricalmeasures", "empiricalmeasuresb", "empcorbarrier"
+    )
     .all()
 )
 from django_pandas.io import read_frame
@@ -26,6 +28,7 @@ df = read_frame(
         "empiricalmeasures__ionic_radii_overlap_cations",
         "vaspcalca__energy_barrier",
         "empcorbarrier__barrier",
+        "empiricalmeasuresb__ewald_energyb",
     ],
 )
 
@@ -35,7 +38,7 @@ df = read_frame(
 import matplotlib.pyplot as plt
 
 # start with a square Figure
-fig = plt.figure(figsize=(5*1.618, 5))  # golden ratio = 1.618
+fig = plt.figure(figsize=(5 * 1.618, 5))  # golden ratio = 1.618
 
 # Add axes for the main plot
 ax = fig.add_subplot(
@@ -60,19 +63,19 @@ plt.show()
 import matplotlib.pyplot as plt
 
 # start with a square Figure
-fig = plt.figure(figsize=(5*1.618, 5))  # golden ratio = 1.618
+fig = plt.figure(figsize=(5 * 1.618, 5))  # golden ratio = 1.618
 
 # Add axes for the main plot
 ax = fig.add_subplot(
     xlabel=r"$\Delta$ Ewald Energy (eV)",
     ylabel="$E_{approx}$ [corrected] (eV)",
-    xlim=(-0.025, 1),
+    xlim=(-9, 21),
     ylim=(-0.25, 10),
 )
 
 # add the data as a scatter
 hb = ax.scatter(
-    x=df["empiricalmeasures__ewald_energy"],  # X
+    x=df["empiricalmeasuresb__ewald_energyb"],  # X
     y=df["empcorbarrier__barrier"],  # Y
     c="green",
     alpha=0.25,
@@ -81,4 +84,3 @@ hb = ax.scatter(
 plt.show()
 
 # --------------------------------------------------------------------------------------
-

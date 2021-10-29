@@ -41,7 +41,7 @@ frac = numpy.append(frac, zero_pt) * 100
 import matplotlib.pyplot as plt
 
 # start with a square Figure
-fig = plt.figure(figsize=(5 * 1.68, 5))  # golden ratio = 1.618
+fig = plt.figure(figsize=(4 * 1.68, 4))  # golden ratio = 1.618
 
 # Add axes for the main plot
 ax1 = fig.add_subplot(
@@ -71,14 +71,15 @@ hb = ax2.scatter(
 )
 
 ax2.spines['right'].set_color('blue')
-ax2.spines['left'].set_color('green')
 ax2.yaxis.label.set_color('blue')
 ax2.tick_params(axis='y', colors='blue')
 
 ax1.spines['left'].set_color('green')
+ax2.spines['left'].set_color('green')
 ax1.yaxis.label.set_color('green')
 ax1.tick_params(axis='y', colors='green')
 
-plt.show()
+# plt.show()
+plt.savefig("relative_length.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
