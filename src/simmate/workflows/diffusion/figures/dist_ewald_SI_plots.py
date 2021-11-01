@@ -38,7 +38,7 @@ df = read_frame(
 import matplotlib.pyplot as plt
 
 # start with a square Figure
-fig = plt.figure(figsize=(5 * 1.618, 5))  # golden ratio = 1.618
+fig = plt.figure(figsize=(4 * 1.618, 4))  # golden ratio = 1.618
 
 # Add axes for the main plot
 ax = fig.add_subplot(
@@ -56,18 +56,19 @@ hb = ax.scatter(
     alpha=0.25,
 )
 
-plt.show()
+# plt.show()
+plt.savefig("length_only.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
 
 import matplotlib.pyplot as plt
 
 # start with a square Figure
-fig = plt.figure(figsize=(5 * 1.618, 5))  # golden ratio = 1.618
+fig = plt.figure(figsize=(4 * 1.618, 4))  # golden ratio = 1.618
 
 # Add axes for the main plot
 ax = fig.add_subplot(
-    xlabel=r"$\Delta$ Ewald Energy (eV)",
+    xlabel=r"$\Delta$ $E_{Ewald}$ (eV)",
     ylabel="$E_{approx}$ [corrected] (eV)",
     xlim=(-9, 21),
     ylim=(-0.25, 10),
@@ -81,6 +82,7 @@ hb = ax.scatter(
     alpha=0.25,
 )
 
-plt.show()
+# plt.show()
+plt.savefig("ewald_only.svg", format="svg")
 
 # --------------------------------------------------------------------------------------

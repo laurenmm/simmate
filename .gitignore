@@ -9,6 +9,9 @@
 *.sqlite3
 db_dump*json
 
+# ignore any Dask files created by workers
+dask-worker-space/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

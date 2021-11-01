@@ -559,3 +559,7 @@ class Relative(models.Model):
 
     class Meta:
         app_label = "diffusion"
+
+class EmpiricalMeasuresD(Calculation):
+    ionic_radii_overlap = models.FloatField(blank=True, null=True)
+    pathway = models.OneToOneField(Pathway, primary_key=True, on_delete=models.CASCADE)
