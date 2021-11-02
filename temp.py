@@ -193,7 +193,7 @@ from simmate.workflows.diffusion.utilities import get_oxi_supercell_path
 # BAD NEB: 1046
 # Y-S-F 1052 9924
 # InF3 2229
-pathway_id = 78
+pathway_id = 11004
 path = Pathway_DB.objects.get(id=pathway_id)
 get_oxi_supercell_path(path.to_pymatgen(), 8).write_path(
     f"{pathway_id}.cif",

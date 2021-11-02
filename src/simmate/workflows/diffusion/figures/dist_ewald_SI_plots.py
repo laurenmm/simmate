@@ -2,6 +2,7 @@
 
 # --------------------------------------------------------------------------------------
 
+import numpy
 
 from simmate.configuration.django import setup_full  # ensures setup
 from simmate.database.diffusion import Pathway as Pathway_DB
@@ -56,6 +57,31 @@ hb = ax.scatter(
     alpha=0.25,
 )
 
+# add hist trend line
+_, divisions = numpy.histogram(df["length"], bins=15)  # range=(0, 1)
+divisions_mid = [
+    (divisions[i] + divisions[i + 1]) / 2 for i, _ in enumerate(divisions[:-1])
+]
+barrier_stats = []
+barrier_stds = []
+for i in range(len(divisions) - 1):
+    div_start = divisions[i]
+    div_end = divisions[i + 1]
+    sample = df[df["length"] > div_start]
+    sample = sample[sample["length"] < div_end]
+    stat = sample["empcorbarrier__barrier"].mean()  #!!! OR MEDIAN...?
+    std = sample["empcorbarrier__barrier"].std()
+    barrier_stats.append(stat)
+    barrier_stds.append(std)
+ax.errorbar(
+    x=divisions_mid,
+    y=barrier_stats,
+    yerr=barrier_stds,
+    fmt="--o",
+    # capsize=6,
+    color="black",
+)
+
 # plt.show()
 plt.savefig("length_only.svg", format="svg")
 
@@ -81,6 +107,34 @@ hb = ax.scatter(
     c="green",
     alpha=0.25,
 )
+
+# add hist trend line
+_, divisions = numpy.histogram(
+    df["empiricalmeasuresb__ewald_energyb"], bins=15, range=(-10, 20)
+)
+divisions_mid = [
+    (divisions[i] + divisions[i + 1]) / 2 for i, _ in enumerate(divisions[:-1])
+]
+barrier_stats = []
+barrier_stds = []
+for i in range(len(divisions) - 1):
+    div_start = divisions[i]
+    div_end = divisions[i + 1]
+    sample = df[df["empiricalmeasuresb__ewald_energyb"] > div_start]
+    sample = sample[sample["empiricalmeasuresb__ewald_energyb"] < div_end]
+    stat = sample["empcorbarrier__barrier"].mean()  #!!! OR MEDIAN...?
+    std = sample["empcorbarrier__barrier"].std()
+    barrier_stats.append(stat)
+    barrier_stds.append(std)
+ax.errorbar(
+    x=divisions_mid,
+    y=barrier_stats,
+    yerr=barrier_stds,
+    fmt="--o",
+    # capsize=6,
+    color="black",
+)
+
 
 # plt.show()
 plt.savefig("ewald_only.svg", format="svg")
