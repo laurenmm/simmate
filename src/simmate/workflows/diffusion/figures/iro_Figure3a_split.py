@@ -14,7 +14,7 @@ queryset = (
         empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
         # empiricalmeasuresb__ewald_energyb__gte=6,
         # empiricalmeasuresb__ewald_energyb__lte=100,
-        length__gte=4.25,
+        # length__gte=4.25,
         # length__lte=4.75,
     )
     .select_related("vaspcalca", "empiricalmeasuresb", "empcorbarrier")
@@ -66,7 +66,7 @@ gs = fig.add_gridspec(
     height_ratios=(2, 7),
     #
     # size of the overall grid (all axes together)
-    left=0.1,   
+    left=0.1,
     right=0.9,
     bottom=0.1,
     top=0.9,
@@ -99,10 +99,10 @@ hb = ax.hexbin(
     edgecolor="black",  # color between hex bins
     reduce_C_function=numpy.std,
     mincnt=5,
-    extent=(-3, 3, -3, 3)
+    extent=(-3, 3, -3, 3),
 )
-ax.set_xlim(-1.1,2.2)
-ax.set_ylim(-2.2,1.5)
+ax.set_xlim(-1.1, 2.2)
+ax.set_ylim(-2.2, 1.5)
 # add the colorbar (for positioning we give it its own axes)
 # where arg is [left, bottom, width, height]
 cax = fig.add_axes([0.33, 0.16, 0.35, 0.03])
@@ -154,3 +154,16 @@ plt.show()
 # plt.savefig("iro.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
+
+import plotly.express as px
+
+fig = px.scatter_3d(
+    df,
+    x="empiricalmeasures__ionic_radii_overlap_anions",
+    y="empiricalmeasures__ionic_radii_overlap_cations",
+    z="empiricalmeasuresb__ewald_energyb",
+    color="empcorbarrier__barrier",
+    range_color=(0, 4),
+)
+fig.show(renderer="browser")
+fig.write_html("3d_iro_ewald.html")

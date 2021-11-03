@@ -12,7 +12,9 @@ queryset = (
         vaspcalca__energy_barrier__gte=0,
         empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
     )
-    .select_related("vaspcalca", "empiricalmeasures", "empcorbarrier")
+    .select_related(
+        "vaspcalca", "empiricalmeasures", "empiricalmeasuresb", "empcorbarrier"
+    )
     .all()
 )
 from django_pandas.io import read_frame
@@ -139,7 +141,39 @@ ax_histy.axhline(0, color="black", linewidth=0.8, linestyle="--")
 ax_histx.tick_params(axis="x", labelbottom=False)
 ax_histy.tick_params(axis="y", labelleft=False)
 
-# plt.show()
-plt.savefig("iro.svg", format="svg")
+plt.show()
+# plt.savefig("iro.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
+
+queryset = (
+    Pathway_DB.objects.filter(
+        vaspcalca__energy_barrier__isnull=False,
+        vaspcalca__energy_barrier__gte=0,
+        empiricalmeasures__ionic_radii_overlap_anions__gte=0.25,
+        empiricalmeasures__ionic_radii_overlap_anions__lte=0.5,
+        empiricalmeasures__ionic_radii_overlap_cations__gte=0.25,
+        empiricalmeasures__ionic_radii_overlap_cations__lte=0.5,
+        # length__lte=3.25,
+        # length__gte=2.75,
+    )
+    .select_related(
+        "vaspcalca", "empiricalmeasures", "empiricalmeasuresb", "empcorbarrier"
+    )
+    .all()
+)
+from django_pandas.io import read_frame
+
+df = read_frame(
+    queryset,
+    fieldnames=[
+        "length",
+        "empiricalmeasuresb__ewald_energyb",
+        "empiricalmeasures__ionic_radii_overlap_anions",
+        "empiricalmeasures__ionic_radii_overlap_cations",
+        "vaspcalca__energy_barrier",
+        "empcorbarrier__barrier",
+    ],
+)
+
+df.plot.scatter("empiricalmeasuresb__ewald_energyb", "empcorbarrier__barrier")
