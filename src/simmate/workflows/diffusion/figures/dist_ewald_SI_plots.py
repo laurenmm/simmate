@@ -12,10 +12,13 @@ queryset = (
         vaspcalca__energy_barrier__isnull=False,
         # vaspcalca__energy_barrier__gte=0,
         # empiricalmeasures__ionic_radii_overlap_anions__gt=-900,
-    )
-    .select_related(
+        # structure__prototype2__formula_reduced="Ba2MnWO6",
+        # structure__prototype2__name="(Cubic) Perovskite",
+        # structure__prototype3__number=22,
+    ).select_related(
         "vaspcalca", "empiricalmeasures", "empiricalmeasuresb", "empcorbarrier"
     )
+    # .distinct("structure")
     .all()
 )
 from django_pandas.io import read_frame
@@ -30,11 +33,70 @@ df = read_frame(
         "vaspcalca__energy_barrier",
         "empcorbarrier__barrier",
         "empiricalmeasuresb__ewald_energyb",
+        # "vaspcalcb__energy_barrier",
+        "structure__prototype3__number",
     ],
 )
 
 # --------------------------------------------------------------------------------------
 
+# Grabbing substructure types to plot as well.
+
+# group_ids = [53, 1457, 22]  # 22
+# colors = ["red", "blue", "orange"]
+
+group_ids = [
+    53,
+    1457,
+    22,
+    # 1336,
+    # "purple",
+    # "brown",
+    # "pink",
+    # "grey",
+    # "olive",
+    # "cyan",
+]
+colors = [
+    "blue",
+    "red",
+    "green",
+    # "orange",
+    # "purple",
+    # "brown",
+    # "pink",
+    # "grey",
+    # "olive",
+    # "cyan",
+]
+
+
+def get_trendline(df, field, hist_bins=None, hist_range=None):
+    # add hist trend line
+    _, divisions = numpy.histogram(
+        df[field],
+        bins=hist_bins,
+        range=hist_range,
+    )
+    divisions_mid = [
+        (divisions[i] + divisions[i + 1]) / 2 for i, _ in enumerate(divisions[:-1])
+    ]
+    barrier_points = []
+    barrier_stds = []
+    for i in range(len(divisions) - 1):
+        div_start = divisions[i]
+        div_end = divisions[i + 1]
+        sample = df[df[field] > div_start]
+        sample = sample[sample[field] < div_end]
+        stat = sample["empcorbarrier__barrier"].mean()  #!!! OR MEDIAN...?
+        std = sample["empcorbarrier__barrier"].std()
+        barrier_points.append(stat)
+        barrier_stds.append(std)
+
+    return divisions_mid, barrier_points, barrier_stds
+
+
+# --------------------------------------------------------------------------------------
 
 import matplotlib.pyplot as plt
 
@@ -57,25 +119,38 @@ hb = ax.scatter(
     alpha=0.25,
 )
 
+# # plot trendlines for subgroups too
+# for group, color in zip(group_ids, colors):
+#     df_mini = df[df["structure__prototype3__number"] == group]
+#     # hb = ax.scatter(
+#     #     x=df_mini["length"],  # X
+#     #     y=df_mini["empcorbarrier__barrier"],  # Y
+#     #     c=color,
+#     #     alpha=0.25,
+#     # )
+#     divisions_mid, barrier_points, barrier_stds = get_trendline(
+#         df_mini,
+#         field="length",
+#         hist_bins=15,
+#         hist_range=(2.25, 5),
+#     )
+#     ax.errorbar(
+#         x=divisions_mid,
+#         y=barrier_points,
+#         yerr=barrier_stds,
+#         fmt="--o",
+#         # capsize=6,
+#         color=color,
+#         # alpha=0.75,
+#     )
+
 # add hist trend line
-_, divisions = numpy.histogram(df["length"], bins=15)  # range=(0, 1)
-divisions_mid = [
-    (divisions[i] + divisions[i + 1]) / 2 for i, _ in enumerate(divisions[:-1])
-]
-barrier_stats = []
-barrier_stds = []
-for i in range(len(divisions) - 1):
-    div_start = divisions[i]
-    div_end = divisions[i + 1]
-    sample = df[df["length"] > div_start]
-    sample = sample[sample["length"] < div_end]
-    stat = sample["empcorbarrier__barrier"].mean()  #!!! OR MEDIAN...?
-    std = sample["empcorbarrier__barrier"].std()
-    barrier_stats.append(stat)
-    barrier_stds.append(std)
+divisions_mid, barrier_points, barrier_stds = get_trendline(
+    df, field="length", hist_bins=15, hist_range=(2.25, 5)
+)
 ax.errorbar(
     x=divisions_mid,
-    y=barrier_stats,
+    y=barrier_points,
     yerr=barrier_stds,
     fmt="--o",
     # capsize=6,
@@ -108,35 +183,45 @@ hb = ax.scatter(
     alpha=0.25,
 )
 
+# # plot trendlines for subgroups too
+# for group, color in zip(group_ids, colors):
+#     df_mini = df[df["structure__prototype3__number"] == group]
+#     # hb = ax.scatter(
+#     #     x=df_mini["empiricalmeasuresb__ewald_energyb"],  # X
+#     #     y=df_mini["empcorbarrier__barrier"],  # Y
+#     #     c=color,
+#     #     alpha=0.25,
+#     # )
+#     divisions_mid, barrier_points, barrier_stds = get_trendline(
+#         df_mini,
+#         field="empiricalmeasuresb__ewald_energyb",
+#         hist_bins=15,
+#         hist_range=(-10, 20),
+#     )
+#     ax.errorbar(
+#         x=divisions_mid,
+#         y=barrier_points,
+#         yerr=barrier_stds,
+#         fmt="--o",
+#         # capsize=6,
+#         color=color,
+#         # alpha=0.75,
+#     )
+
 # add hist trend line
-_, divisions = numpy.histogram(
-    df["empiricalmeasuresb__ewald_energyb"], bins=15, range=(-10, 20)
+divisions_mid, barrier_points, barrier_stds = get_trendline(
+    df, field="empiricalmeasuresb__ewald_energyb", hist_bins=15, hist_range=(-10, 20)
 )
-divisions_mid = [
-    (divisions[i] + divisions[i + 1]) / 2 for i, _ in enumerate(divisions[:-1])
-]
-barrier_stats = []
-barrier_stds = []
-for i in range(len(divisions) - 1):
-    div_start = divisions[i]
-    div_end = divisions[i + 1]
-    sample = df[df["empiricalmeasuresb__ewald_energyb"] > div_start]
-    sample = sample[sample["empiricalmeasuresb__ewald_energyb"] < div_end]
-    stat = sample["empcorbarrier__barrier"].mean()  #!!! OR MEDIAN...?
-    std = sample["empcorbarrier__barrier"].std()
-    barrier_stats.append(stat)
-    barrier_stds.append(std)
 ax.errorbar(
     x=divisions_mid,
-    y=barrier_stats,
+    y=barrier_points,
     yerr=barrier_stds,
     fmt="--o",
     # capsize=6,
     color="black",
 )
 
-
-# plt.show()
-plt.savefig("ewald_only.svg", format="svg")
+plt.show()
+# plt.savefig("ewald_only.svg", format="svg")
 
 # --------------------------------------------------------------------------------------
