@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import matplotlib
+
+font = {'family' : 'normal',
+        'weight' : 'normal',
+        'size'   : 14}
+
+matplotlib.rc('font', **font)
+
 # --------------------------------------------------------------------------------------
 
 import json
@@ -360,9 +368,7 @@ y_test2_predicted = reg_relax_emp.predict(X_test)
 y_test2_errors = y_test2_predicted - y_test2_expected
 y_test2_std = numpy.std(y_test2_errors)
 y_test2_median = numpy.median(y_test2_errors)
-print(
-    f"The error (median +/- stdev) for RELAX+EMP: {y_test2_median} +/- {y_test2_std}"
-)
+print(f"The error (median +/- stdev) for RELAX+EMP: {y_test2_median} +/- {y_test2_std}")
 
 # --------------------------------------------------------------------------------------
 
@@ -424,12 +430,14 @@ gs = fig.add_gridspec(
 # First plot is just the approximated barriers
 ax1 = fig.add_subplot(
     gs[0, 0],
-    xlabel="Barrier (eV) [static]",
-    ylabel=r"Midpoint-only NEB Barrier (eV)",
     xlim=(-1.5, 5),
     ylim=(-1.5, 5),
 )
-ax1.xaxis.set_ticks([-1,0,1,2,3,4,5])
+ax1.set_yticks([-1, 0, 1, 2, 3, 4])
+ax1.set_yticklabels(["", "0", "", "2", "", "4"])
+ax1.set_xticks([-1, 0, 1, 2, 3, 4])
+ax1.set_xticklabels(["", "0", "", "2", "", "4"])
+
 hb = ax1.scatter(
     x=df["vaspcalca__energy_barrier"],  # X
     y=df["vaspcalcb__energy_barrier"],  # Y
@@ -451,7 +459,6 @@ add_reg_plot(ax1, reg_static, std_error_static, "Green", True)
 # 2nd plot is the empirically-corrected vaspcalca
 ax2 = fig.add_subplot(
     gs[0, 1],
-    xlabel="Barrier (eV) [static+ec]",
     sharex=ax1,
     sharey=ax1,
 )
@@ -468,9 +475,10 @@ add_reg_plot(ax2, reg_static_emp, y_test1_std, "Blue", False)
 # 3rd plot is the partial relaxation
 ax3 = fig.add_subplot(
     gs[1, 0],
-    xlabel=f"Barrier (eV) [NSW={max_nsw}; EDIFFG={convergence}]",
     sharex=ax1,
     sharey=ax1,
+    xlabel="$E_{approx}$ (eV)",
+    ylabel=r"$E_{NEB} (eV)$",
 )
 plt.setp(ax3.get_yticklabels(), visible=True)
 hb = ax3.scatter(
@@ -485,7 +493,6 @@ add_reg_plot(ax3, reg_relax, std_error_relax, "Red", True)
 # 4th plot is the empirically-corrected partial relaxation
 ax4 = fig.add_subplot(
     gs[1, 1],
-    xlabel="Approximated Barrier (eV) [relax+ec]",
     sharex=ax1,
     sharey=ax1,
 )
@@ -509,7 +516,7 @@ static_errors = df["vaspcalca__energy_barrier"] - df["vaspcalcb__energy_barrier"
 import matplotlib.pyplot as plt
 
 # start with a overall Figure canvas
-fig = plt.figure(figsize=(6, 5))  # golden ratio = 1.618
+fig = plt.figure(figsize=(6, 6))  # golden ratio = 1.618
 
 # Add a gridspec (which sets up a total of 3 subplots for us -- stacked on one another)
 gs = fig.add_gridspec(
@@ -535,7 +542,6 @@ range_for_bins = (-1.0, 1.0)
 # Static
 ax1 = fig.add_subplot(
     gs[0, 0],
-    xlabel=r"Barrier Error vs. NEB (eV)",
 )
 hb = ax1.hist(
     x=static_errors,  # X
@@ -545,11 +551,14 @@ hb = ax1.hist(
     edgecolor="white",
     linewidth=0.5,
 )
+ax1.set_yticks([0, 25, 50])
+ax1.set_yticklabels(["0", "", "50"])
+ax1.set_xticks([-1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0,])
+ax1.set_xticklabels(["-1.0", "", "-0.5", "", "0.0", "", "0.5", "", "1.0",])
 
 # Static + Empirical correction
 ax2 = fig.add_subplot(
     gs[1, 0],
-    xlabel=r"Barrier Error vs. NEB (eV)",
     ylabel=r"Pathways (#)",
     sharex=ax1,
     sharey=ax1,
@@ -566,7 +575,6 @@ hb = ax2.hist(
 # Relax
 ax3 = fig.add_subplot(
     gs[2, 0],
-    xlabel=r"Barrier Error vs. NEB (eV)",
     sharex=ax1,
     sharey=ax1,
 )
@@ -582,7 +590,7 @@ hb = ax3.hist(
 # Relax + Empirical Correction
 ax4 = fig.add_subplot(
     gs[3, 0],
-    xlabel=r"Barrier Error vs. NEB (eV)",
+    xlabel=r"Barrier Error ($E_{approx}$ - $E_{NEB}$) (eV)",
     sharex=ax1,
     sharey=ax1,
 )
@@ -600,6 +608,15 @@ hb = ax4.hist(
 for ax in [ax1, ax2, ax3, ax4]:
     ax.axvline(0, color="black", linewidth=0.8, linestyle="--")
 
+# add stdev lines
+# add vertical lines
+for ax, median, stdev in zip(
+    [ax1, ax2, ax3, ax4],
+    [median_error_static, y_test1_median, median_error_relax, y_test2_median],
+    [std_error_static, y_test1_std, std_error_relax, y_test2_std],
+):  
+    ax.axvline(median+stdev, color="black", linewidth=0.8, linestyle="--")
+    ax.axvline(median-stdev, color="black", linewidth=0.8, linestyle="--")
 # plt.show()
 plt.savefig("hist.svg", format="svg")
 
@@ -671,3 +688,4 @@ plt.savefig("hist.svg", format="svg")
 # [0.8566552885935623, -0.15232905154653764, 0.03324373596524466]
 # 0.6757090693730672
 # The error (median +/- stdev) for STATIC+EMP: -0.009765134714721846 +/- 0.28599423562696025
+
