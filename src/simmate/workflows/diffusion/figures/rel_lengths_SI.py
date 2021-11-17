@@ -34,6 +34,7 @@ zero_pt = (
     / Relative.objects.filter(length=0).count()
 )
 division_mid = numpy.append(division_mid, 0)
+division_mid += 1
 frac = numpy.append(frac, zero_pt) * 100
 
 # --------------------------------------------------------------------------------------
@@ -45,17 +46,17 @@ fig = plt.figure(figsize=(4 * 1.68, 4))  # golden ratio = 1.618
 
 # Add axes for the main plot
 ax1 = fig.add_subplot(
-    xlabel="$(L - L_{min}) / L_{min}$",
+    xlabel="$L$ $/$ $L_{min}$",
     ylabel=r"Number of Pathways (#)",
-    xlim=(-0.05, 1.05),
+    xlim=(0.95, 2.05),
     # ylim=(-0.05, 2),
 )
 
 # add the data as a scatter
 hb = ax1.hist(
-    x=[df1["length"], df2["length"]],  # X
+    x=[df1["length"] + 1, df2["length"] +1],  # X
     bins=nbins,
-    range=(0, 1),
+    range=(1, 2),
     color=["green", "silver"],
     edgecolor="white",
     linewidth=0.5,

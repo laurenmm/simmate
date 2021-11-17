@@ -109,12 +109,12 @@ def add_scatter_and_trendline(
 import matplotlib.pyplot as plt
 
 # start with a overall Figure canvas
-fig = plt.figure(figsize=(12, 30))  # main--> (12, 12); SI-->(12, 30)
+fig = plt.figure(figsize=(12, 10))  # main--> (12, 12); SI-->(12, 30)
 
 # Add a gridspec (which sets up a total of 3 subplots for us -- stacked on one another)
 gs = fig.add_gridspec(
     # grid dimensions and column/row relative sizes
-    nrows=12,  # main--> 4; SI-->12
+    nrows=3,  # main--> 3; SI-->13
     ncols=2,
     # width_ratios=(1, 1, 1),
     # height_ratios=(1, 1, 1),
@@ -207,25 +207,26 @@ df_lmf = df[df["structure__prototype2__name"] == "Li2MoF6"]
 # structure__prototype2__name
 # structure__prototype2__formula_reduced
 
-# dfs = [df_22, df_1457, df_mlk]
-# colors = ["blue", "red", "purple"]
+dfs = [df_1457, df_mlk]
+colors = ["blue", "red"]
 # change number of subplots above if you change the length of this
 
 
-dfs = [
-    df_53,
-    df_art,
-    df_opr,
-    df_1336,
-    df_cry,
-    df_fgk,
-    df_alo,
-    df_scl,
-    df_fkn,
-    df_dpr,
-    df_lmf,
-]
-colors = ["green"] * len(dfs)
+# dfs = [
+#     df_22,
+#     df_53,
+#     df_art,
+#     df_opr,
+#     df_1336,
+#     df_cry,
+#     df_fgk,
+#     df_alo,
+#     df_scl,
+#     df_fkn,
+#     df_dpr,
+#     df_lmf,
+# ]
+# colors = ["green"] * len(dfs)
 
 # --------------------------------------------------------------------------------------
 
