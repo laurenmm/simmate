@@ -10,7 +10,7 @@ from prefect import Flow, Parameter, task
 from simmate.configuration.django import setup_full  # ensures setup
 from simmate.database.diffusion import (
     MaterialsProjectStructure as MPStructure,
-    MatProjData,
+    MatProjData2,
 )
 
 
@@ -22,15 +22,22 @@ def grab_data(structure_id):
     # Grabbing cost
     comp = structure.composition
     # costs_orig = CostDBElements() ## Fluoride cost is super misleading
-    costs_new = CostDBCSV(os.path.join(os.getcwd(), "element_prices.csv"))
-    a = CostAnalyzer(costs_new)
-    cost_kg = a.get_cost_per_kg(comp)
-    cost_mol = a.get_cost_per_mol(comp)
+    try:
+        costs_new = CostDBCSV(os.path.join(os.getcwd(), "element_prices.csv"))
+        a = CostAnalyzer(costs_new)
+        cost_kg = a.get_cost_per_kg(comp)
+        cost_mol = a.get_cost_per_mol(comp)
+    except:
+        cost_kg = None
+        cost_mol = None
 
     # Grabbing bandgap
-    mpr = MPRester("2Tg7uUvaTAPHJQXl")
-    data = mpr.query({"task_id": structure_id}, ["band_gap"])
-    band_gap = data[0]["band_gap"]
+    try:
+        mpr = MPRester("2Tg7uUvaTAPHJQXl")
+        data = mpr.query({"task_id": structure_id}, ["band_gap"])
+        band_gap = data[0]["band_gap"]
+    except:
+        band_gap = None
 
     return cost_kg, cost_mol, band_gap
 
@@ -40,7 +47,7 @@ def save_to_db(structure_id, new_data):
 
     cost_kg, cost_mol, band_gap = new_data
 
-    p = MatProjData(
+    p = MatProjData2(
         structure_id=structure_id,
         band_gap=band_gap,
         cost_per_mol=cost_mol,
@@ -55,17 +62,17 @@ with Flow("PrototypeMatcher") as workflow:
 
 
 
-# from dask.distributed import Client
+from dask.distributed import Client
 
-# client = Client(preload="simmate.configuration.dask.init_django_worker")
-# structure_ids = (
-#     MPStructure.objects.filter(matprojdata__isnull=True)
-#     .values_list("id", flat=True)
-#     .all()
-# )
+client = Client(preload="simmate.configuration.dask.init_django_worker")
+structure_ids = (
+    MPStructure.objects.filter(matprojdata2__isnull=True)
+    .values_list("id", flat=True)
+    .all()
+)
 
-# client.map(
-#     workflow.run,
-#     [{"structure_id": id} for id in structure_ids],
-#     pure=False,
-# )
+client.map(
+    workflow.run,
+    [{"structure_id": id} for id in structure_ids],
+    pure=False,
+)

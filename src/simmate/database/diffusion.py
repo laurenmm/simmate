@@ -536,6 +536,14 @@ class MatProjData(models.Model):
     class Meta:
         app_label = "diffusion"
 
+class MatProjData2(models.Model):
+    band_gap = models.FloatField(blank=True, null=True)
+    cost_per_mol = models.FloatField(blank=True, null=True)
+    cost_per_kg = models.FloatField(blank=True, null=True)
+    structure = models.OneToOneField(MaterialsProjectStructure, on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "diffusion"
 
 class EmpCorBarrier(models.Model):
     barrier = models.FloatField(blank=True, null=True)
